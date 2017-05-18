@@ -31,21 +31,21 @@ void user_account_domsg(handler_msg* msg,void* g,uint32_t hid)
 {
 	switch(msg->_msgid)
 	{
-	case USERMSG_LOGIN:
-		handle_usermsg_login(msg,g);
-		break;
-	case USERMSG_CHECK:
-		handle_usermsg_check(msg,g);
-		break;
-	case USERMSG_ADD:
-		handle_usermsg_add(msg,g);
-		break;
-	case USERMSG_UPDATE:
-		handle_usermsg_update(msg,g);
-		break;
-	case USERMSG_UPDATEPASSWORD:
-		handle_usermsg_updatepassword(msg,g);
-		break;
+//	case USERMSG_LOGIN:
+//		handle_usermsg_login(msg,g);
+//		break;
+//	case USERMSG_CHECK:
+//		handle_usermsg_check(msg,g);
+//		break;
+//	case USERMSG_ADD:
+//		handle_usermsg_add(msg,g);
+//		break;
+//	case USERMSG_UPDATE:
+//		handle_usermsg_update(msg,g);
+//		break;
+//	case USERMSG_UPDATEPASSWORD:
+//		handle_usermsg_updatepassword(msg,g);
+//		break;
 	}
 }
 

@@ -10,5 +10,6 @@
 
 #include "antlib.h"
 
+int set_serverkey(const char* key,const char* table,int svrid);
 
 #endif /* USER_MSG_H_ */

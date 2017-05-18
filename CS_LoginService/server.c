@@ -76,14 +76,14 @@ int init_server(int* running)
 		}
 	}
 
-	if(is_config_db(config,0) == 0)
-	{
-		init_mydb(config,0);
-	}
-	else
-	{
-		return -1;
-	}
+//	if(is_config_db(config,0) == 0)
+//	{
+//		init_mydb(config,0);
+//	}
+//	else
+//	{
+//		return -1;
+//	}
 
 	userlist_init(2,config_server_user_poolsize(config));
 	if(set_serverkey(config_server_userkey(config),config_server_usertable(config),
