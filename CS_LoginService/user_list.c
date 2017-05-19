@@ -31,9 +31,9 @@ void user_account_domsg(handler_msg* msg,void* g,uint32_t hid)
 {
 	switch(msg->_msgid)
 	{
-//	case USERMSG_LOGIN:
-//		handle_usermsg_login(msg,g);
-//		break;
+	case USERMSG_LOGIN:
+		handle_usermsg_login(msg,g);
+		break;
 //	case USERMSG_CHECK:
 //		handle_usermsg_check(msg,g);
 //		break;
