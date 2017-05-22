@@ -49,32 +49,37 @@ int init_server(int* running)
 	//protocol
 	init_protocollib();
 
+	const char* ip = "0.0.0.0";
+	uint32_t addr = INADDR_ANY;
+	if (ip&&ip[0]) {addr=inet_addr(ip);}
+	char str[14] = "hello World !";
+	conn_tcpprotocol(1,addr,7000,str,sizeof(str),0,1,1);
 
-	if(is_config_cmd(config) == 0)
-	{
-		const char* ip = config_cmd_ip(config);
-		int port = config_cmd_port(config);
-		int protocol = config_cmd_protocol(config);
-		if(0 != bind_tcpprotocol(ip,port,protocol))
-		{
-			return -1;
-		}
-	}
-	int i;
-	for(i = 0; i < 128; i++)
-	{
-		if(0 != is_config_user(config,i))
-		{
-			continue;
-		}
-		const char* ip = config_user_ip(config,i);
-		int port = config_user_port(config,i);
-		int protocol = config_user_protocol(config,i);
-		if(0 != bind_tcpprotocol(ip,port,protocol))
-		{
-			return -1;
-		}
-	}
+//	if(is_config_cmd(config) == 0)
+//	{
+//		const char* ip = config_cmd_ip(config);
+//		int port = config_cmd_port(config);
+//		int protocol = config_cmd_protocol(config);
+//		if(0 != bind_tcpprotocol(ip,port,protocol))
+//		{
+//			return -1;
+//		}
+//	}
+//	int i;
+//	for(i = 0; i < 128; i++)
+//	{
+//		if(0 != is_config_user(config,i))
+//		{
+//			continue;
+//		}
+//		const char* ip = config_user_ip(config,i);
+//		int port = config_user_port(config,i);
+//		int protocol = config_user_protocol(config,i);
+//		if(0 != bind_tcpprotocol(ip,port,protocol))
+//		{
+//			return -1;
+//		}
+//	}
 
 //	if(is_config_db(config,0) == 0)
 //	{
@@ -85,12 +90,12 @@ int init_server(int* running)
 //		return -1;
 //	}
 
-	userlist_init(2,config_server_user_poolsize(config));
-	if(set_serverkey(config_server_userkey(config),config_server_usertable(config),
-			config_server_userserverid(config)) == -1)
-	{
-		return -1;;
-	}
+//	userlist_init(2,config_server_user_poolsize(config));
+//	if(set_serverkey(config_server_userkey(config),config_server_usertable(config),
+//			config_server_userserverid(config)) == -1)
+//	{
+//		return -1;;
+//	}
 
 	close_server_config(config);
 	return 0;

@@ -51,38 +51,38 @@ void handle_usermsg_login(handler_msg* msg,void* user_group)
 {
 	char* message = (char*)MSGINFO_FIELD(msg,0);
 	tcp_stream* info = (tcp_stream*)msg->_data;
-	struct user_account* user = _load_user_cache(name,user_group);
-	int result,n;
-	uint32_t t = get_mytime();
-	char pswd[128]="";
-	//0 OK,1 password error,2 user limit used,3 user not exist
-	if(user->_state == -1)
-	{
-		result = 3;
-	} else if(user->_time > t) {
-		result = 2;
-		t = user->_time - t;
-	} else {
-		MYMD5_ENCRYPT2((uint8_t*)user->_name,strlen(user->_name),(uint8_t*)password,strlen(password),pswd);
-		if(memcmp(user->_password,pswd,32) == 0)
-		{
-			n = sprintf(pswd,"%s:%lu:%u",_g_user_server._key,user->_id,t);
-			MD5((uint8_t*)pswd,n,pswd);
-			result = 0;
-		} else { result = 1; }
-	}
-	//
-	if(result == 0)
-	{
-		info->_len = sprintf(info->_buf,"{\"msg\":%d,\"result\":0,\"id\":%lu,\"key\":\"%s\",\"time\":%u}",
-				USERMSG_LOGIN_BACK,user->_id,pswd,t);
-	}
-	else
-	{
-		info->_len = sprintf(info->_buf,"{\"msg\":%d,\"result\":%d,\"id\":0,\"key\":\"\",\"time\":%u}",
-				USERMSG_LOGIN_BACK,result,result==2?t:0);
-	}
+//	struct user_account* user = _load_user_cache(name,user_group);
+//	int result,n;
+//	uint32_t t = get_mytime();
+//	char pswd[128]="";
+//	//0 OK,1 password error,2 user limit used,3 user not exist
+//	if(user->_state == -1)
+//	{
+//		result = 3;
+//	} else if(user->_time > t) {
+//		result = 2;
+//		t = user->_time - t;
+//	} else {
+//		MYMD5_ENCRYPT2((uint8_t*)user->_name,strlen(user->_name),(uint8_t*)password,strlen(password),pswd);
+//		if(memcmp(user->_password,pswd,32) == 0)
+//		{
+//			n = sprintf(pswd,"%s:%lu:%u",_g_user_server._key,user->_id,t);
+//			MD5((uint8_t*)pswd,n,pswd);
+//			result = 0;
+//		} else { result = 1; }
+//	}
+//	//
+//	if(result == 0)
+//	{
+//		info->_len = sprintf(info->_buf,"{\"msg\":%d,\"result\":0,\"id\":%lu,\"key\":\"%s\",\"time\":%u}",
+//				USERMSG_LOGIN_BACK,user->_id,pswd,t);
+//	}
+//	else
+//	{
+//		info->_len = sprintf(info->_buf,"{\"msg\":%d,\"result\":%d,\"id\":0,\"key\":\"\",\"time\":%u}",
+//				USERMSG_LOGIN_BACK,result,result==2?t:0);
+//	}
 	msg->_msgid = 0;
-	USERLOG("%s [login]name=%s,result=%d,ip=%s",get_log_date(),user->_name,result,to_strip(info->_ip));
+//	USERLOG("%s [login]name=%s,result=%d,ip=%s",get_log_date(),user->_name,result,to_strip(info->_ip));
 	tcp_sendmsg(info->_netid,msg);
 }
