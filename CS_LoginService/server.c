@@ -11,6 +11,7 @@
 #include "server_db.h"
 #include "user_list.h"
 #include "user_msg.h"
+#include "packet.h"
 #include <signal.h>
 
 
@@ -49,12 +50,20 @@ int init_server(int* running)
 	//protocol
 	init_protocollib();
 
+	char str[10240];
 	const char* ip = "0.0.0.0";
 	uint32_t addr = INADDR_ANY;
 	if (ip&&ip[0]) {addr=inet_addr(ip);}
-	char str[14] = "hello World !";
-	conn_tcpprotocol(1,addr,7000,str,sizeof(str),0,1,1);
 
+	tcp_packet* packet = create_packet(0x101);
+	push_packet_int32(packet,3305);
+	push_packet_end(packet);
+
+	memcpy(str,packet->_head,PACKET_BY_HEADER_SIZE);
+	memcpy(str + PACKET_BY_HEADER_SIZE,packet->_buf, packet->_off);
+	conn_tcpprotocol(1,addr,7000,str,packet->_off + PACKET_BY_HEADER_SIZE,0,1,1);
+
+	destory_packet(packet);
 //	if(is_config_cmd(config) == 0)
 //	{
 //		const char* ip = config_cmd_ip(config);

@@ -10,4 +10,6 @@
 
 void init_netprotocol();
 
+void write_head(int cmd);
+
 #endif /* NET_PROTOCOL_H_ */
