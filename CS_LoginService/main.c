@@ -14,7 +14,7 @@ int main(int argc,char** argv)
 	{
 		return 0;
 	}
-	init_netprotocol();
+//	init_netprotocol();
 	start_server();
 	while(is_running)
 	{

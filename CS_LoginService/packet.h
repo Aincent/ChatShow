@@ -75,12 +75,15 @@ static inline void push_packet_str(tcp_packet* packet,const char* vl,int len)
 static inline void push_packet_end(tcp_packet* packet)
 {
 //	hton16(packet->_head,packet->_off);
-	short len = htons(packet->_off);
+	short len = htons(packet->_off + PACKET_BY_HEADER_SIZE  - 2);
 	memcpy(packet->_head,&len,2);
-	packet->_buf[5] = (char)packet->cversion;
+	memcpy(packet->_head+2,packet->name,2);
+	packet->_head[4] = (char)packet->cversion;
+	packet->_head[5] = (char)packet->csubversion;
 	hton16(packet->_head+6,packet->cmd);
-	packet->_buf[9] = (char)packet->code;
+	packet->_head[8] = (char)packet->code;
 }
+
 
 static inline void destory_packet(tcp_packet* packet)
 {

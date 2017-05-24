@@ -12,6 +12,7 @@
 #include "user_list.h"
 #include "user_msg.h"
 #include "packet.h"
+#include "gate_server.h"
 #include <signal.h>
 
 
@@ -43,12 +44,16 @@ int init_server(int* running)
 	init_handlerlib(config_server_id(config),config_handlers_count(config));
 	create_handlers_group(1,config_tcp_threads_count(config));
 	create_handlers_group(2,config_work_threads_count(config));
+	create_handlers_group(3,config_work_threads_count(config));
 	//log
 	init_loglib(2,config_log_level(config),config_log_prev(config));
 	//net
 	init_tcplib(1,config_tcp_handlers_count(config));
 	//protocol
 	init_protocollib();
+	gateserver_init(3);
+
+	init_netprotocol();
 
 	char str[10240];
 	const char* ip = "0.0.0.0";
@@ -58,6 +63,8 @@ int init_server(int* running)
 	tcp_packet* packet = create_packet(0x101);
 	push_packet_int32(packet,3305);
 	push_packet_end(packet);
+
+
 
 	memcpy(str,packet->_head,PACKET_BY_HEADER_SIZE);
 	memcpy(str + PACKET_BY_HEADER_SIZE,packet->_buf, packet->_off);
