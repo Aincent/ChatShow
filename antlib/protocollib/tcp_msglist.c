@@ -240,7 +240,7 @@ int tcpmsg_putout_range(handler_msg* msg,char* addmsg,int addlen)
 	tcp_stream* s = (tcp_stream*)msg->_data;
 	if(s->_len - s->_off <= addlen)
 	{
-		if(addmsg)
+		if(addmsg != NULL)
 		{
 			n =  s->_len-s->_off;
 			memcpy(s->_buf+s->_off, addmsg, n);

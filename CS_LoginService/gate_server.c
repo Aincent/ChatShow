@@ -104,6 +104,7 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 			tcp_stream* info = (tcp_stream*)msg->_data;
 			struct gate_service_config* _g_server_config = (struct gate_service_config*)g;
 			printf("Hello ....msgid = %d  netid = %lld _handlerid = %d  hid = %d \n",msg->_msgid, info->_netid,_g_server_config->_handlerid,hid);
+			printf("%d \n", ntoh32(info->_buf));
 			break;
 		}
 	}
