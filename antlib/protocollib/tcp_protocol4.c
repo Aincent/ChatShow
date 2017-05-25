@@ -16,13 +16,14 @@ int _parse_tcp4msg(struct tcp_connection* c)
 	if(msg == NULL)
 	{
 		//parse head
-		if(TPD_MSGBEGIN+4 > c->_offset)
+		if(TPD_MSGBEGIN+9 > c->_offset)
 		{
 			return -1;
 		}
 		char* buf = c->_buf + TPD_MSGBEGIN;
-		uint16_t msgid = ntoh16(buf);
-		uint16_t msglen = ntoh16(buf+2);
+
+		uint16_t msglen = ntoh16(buf) + 2 - 9;
+		uint16_t msgid = ntoh16(buf + 6) ;
 		//check message
 		msg = tcpmsg_getbyid(msgid,msglen,TPD_USERID,c->_id._i64,TPD_IP);
 		if(msg == NULL)
@@ -30,7 +31,7 @@ int _parse_tcp4msg(struct tcp_connection* c)
 			tcpconnection_close(c,"tcp4 error message");
 			return -1;
 		}
-		TPD_MSGBEGIN += 4;
+		TPD_MSGBEGIN += 9;
 		//put out ,if only message head,
 		if(msglen == 0)
 		{
@@ -81,11 +82,11 @@ void tcp4_do_msg(handler_msg* msg,struct tcp_connection* c)
 	{
 		return;
 	}
-	tcp_stream* s = (tcp_stream*)msg->_data;
-	hton16(s->_head+12,msg->_msgid);
-	hton16(s->_head+14,s->_len);
-	msg->_datalen = s->_len +4;
-	msg->_data = s->_head + 12;
+//	tcp_stream* s = (tcp_stream*)msg->_data;
+//	hton16(s->_head+12,msg->_msgid);
+//	hton16(s->_head+14,s->_len);
+//	msg->_datalen = s->_len +4;
+//	msg->_data = s->_head + 12;
 	tcpconnection_add_msg(c,msg);
 }
 

@@ -9,14 +9,16 @@
 #define GATE_SERVER_H_
 #include "antlib.h"
 
-#define GATEMSG_INFO 	0x103
+#define GATE_SERVICER_NUM 10
+#define CONN_GATE_INFO 	0x101
 
 void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid);
 
 void gate_service_doproc(void* hdata,uint32_t hid);
 
-void gateserver_init(int handler_group);
+void gate_server_init(int handler_group);
 
-int gateserver_handlerid();
+uint32_t gate_server_handlerid();
 
+int gate_service_conn(int svrid,const char* ip,int port,int protocol_type);
 #endif /* GATE_SERVER_H_ */

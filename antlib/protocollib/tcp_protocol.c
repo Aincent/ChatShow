@@ -27,9 +27,16 @@ void tcp_connected(int result,struct tcp_connection* c,handler_msg* msg)
 	else if(msg)
 	{
 		struct tcp_connect_data* data = (struct tcp_connect_data*)msg->_data;
-		msg->_datalen = data->_msglen;
-		msg->_data = data->_msg;
-		tcpconnection_add_msg(c,msg);
+		if(data->_user_handlerid > 0)
+		{
+			msg->_userid = c->_id._i64;
+			msg->_msgid = TCPCONNECT_MSGID;
+			send_handler_msg(data->_user_handlerid,msg);
+		}
+
+//		msg->_datalen = data->_msglen;
+//		msg->_data = data->_msg;
+//		tcpconnection_add_msg(c,msg);
 	}
 	TPD_MSGBEGIN = 0;
 	TPD_MSGOFF = 0;

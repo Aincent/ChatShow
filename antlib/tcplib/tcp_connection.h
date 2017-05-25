@@ -59,6 +59,9 @@ static inline int tcpconnection_is_empty(struct tcp_connection* c)
 }
 static inline int tcpconnection_is_timeout(struct tcp_connection* c,uint32_t t)
 {
+	if(c->_type == 1)
+		return false;
+
 	return c->_active_time < t;
 }
 

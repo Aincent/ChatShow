@@ -32,7 +32,7 @@ void do_user_netmsg(handler_msg* msg,uint64_t userid,uint64_t netid)
 
 void do_gate_netmsg(handler_msg* msg,uint64_t userid,uint64_t netid)
 {
-	send_handler_msg(gateserver_handlerid(),msg);
+	send_handler_msg(gate_server_handlerid(netid),msg);
 }
 
 void init_netprotocol()
@@ -41,5 +41,5 @@ void init_netprotocol()
 	TCPMSG_REGITST_STRING("user","login",USERMSG_LOGIN,do_user_netmsg);
 
 	struct pm_tcpmsg_field gatemsg[1] = {{"userid",1,1,32}};
-	tcpmsg_regist_binary(GATEMSG_INFO,gatemsg,1,do_gate_netmsg);
+	tcpmsg_regist_binary(CONN_GATE_INFO,gatemsg,1,do_gate_netmsg);
 }

@@ -20,7 +20,6 @@ typedef struct tcp_packet {
     unsigned char cversion;
     unsigned char csubversion;
     unsigned char code;
-	char _head[PACKET_BY_HEADER_SIZE + 1];
 	char _buf[PACKET_BY_BODY_SIZE + 1];
 }tcp_packet;
 
@@ -28,7 +27,7 @@ typedef struct tcp_packet {
 static inline tcp_packet* create_packet(const short cmd)
 {
 	tcp_packet* packet = my_new(tcp_packet);
-	packet->_off = 0;
+	packet->_off = PACKET_BY_HEADER_SIZE;
 	packet->cmd = cmd;
 	strcpy(packet->name,"BY");
 	packet->cversion = 1;
@@ -75,13 +74,13 @@ static inline void push_packet_str(tcp_packet* packet,const char* vl,int len)
 static inline void push_packet_end(tcp_packet* packet)
 {
 //	hton16(packet->_head,packet->_off);
-	short len = htons(packet->_off + PACKET_BY_HEADER_SIZE  - 2);
-	memcpy(packet->_head,&len,2);
-	memcpy(packet->_head+2,packet->name,2);
-	packet->_head[4] = (char)packet->cversion;
-	packet->_head[5] = (char)packet->csubversion;
-	hton16(packet->_head+6,packet->cmd);
-	packet->_head[8] = (char)packet->code;
+	short len = htons(packet->_off - 2);
+	memcpy(packet->_buf,&len,2);
+	memcpy(packet->_buf+2,packet->name,2);
+	packet->_buf[4] = (char)packet->cversion;
+	packet->_buf[5] = (char)packet->csubversion;
+	hton16(packet->_buf+6,packet->cmd);
+	packet->_buf[8] = (char)packet->code;
 }
 
 

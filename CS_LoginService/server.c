@@ -51,26 +51,13 @@ int init_server(int* running)
 	init_tcplib(1,config_tcp_handlers_count(config));
 	//protocol
 	init_protocollib();
-	gateserver_init(3);
+
+	gate_server_init(3);
 
 	init_netprotocol();
 
-	char str[10240];
-	const char* ip = "0.0.0.0";
-	uint32_t addr = INADDR_ANY;
-	if (ip&&ip[0]) {addr=inet_addr(ip);}
+	gate_service_conn(1,"0.0.0.0",7000,1);
 
-	tcp_packet* packet = create_packet(0x101);
-	push_packet_int32(packet,3305);
-	push_packet_end(packet);
-
-
-
-	memcpy(str,packet->_head,PACKET_BY_HEADER_SIZE);
-	memcpy(str + PACKET_BY_HEADER_SIZE,packet->_buf, packet->_off);
-	conn_tcpprotocol(1,addr,7000,str,packet->_off + PACKET_BY_HEADER_SIZE,0,1,1);
-
-	destory_packet(packet);
 //	if(is_config_cmd(config) == 0)
 //	{
 //		const char* ip = config_cmd_ip(config);
@@ -116,6 +103,7 @@ int init_server(int* running)
 	close_server_config(config);
 	return 0;
 }
+
 
 void uninit_server()
 {

@@ -145,6 +145,7 @@ int config_master_protocol(void* f)
 {
 	return get_value_int(f,"mster_server","server_protocol",0);
 }
+////////////////////////////////////////////////////////////////////////////////////
 
 int is_config_cmd(void* f)
 {

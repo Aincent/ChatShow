@@ -246,10 +246,10 @@ int tcpmsg_putout_range(handler_msg* msg,char* addmsg,int addlen)
 			memcpy(s->_buf+s->_off, addmsg, n);
 		} else { n = 0;}
 		s->_off = 0;
-		if(parse_stringmsg(s) == -1)
-		{
-			return -2;
-		}
+//		if(parse_stringmsg(s) == -1)
+//		{
+//			return -2;
+//		}
 		((struct tcpmsg_table*)(s->_tb))->_domsg_f(msg,msg->_userid,s->_netid);
 		return n;//>=0
 	}
