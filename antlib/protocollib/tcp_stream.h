@@ -20,7 +20,7 @@ int _hton64(char* buf,uint64_t v);
 //////////////////////////////////////////////////////////////
 
 #define ntoh16(buf) (ntohs(*((uint16_t*)(buf))))
-#define ntoh32(buf) (ntohl(*((uint16_t*)(buf))))
+#define ntoh32(buf) (ntohl(*((uint32_t*)(buf))))
 #define ntoh64(buf) _ntoh64(buf)
 
 #define hton16(buf,v16) do{v16=htons(v16);memcpy(buf,&v16,2);}while(0)

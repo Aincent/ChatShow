@@ -24,7 +24,6 @@ int _parse_tcp4msg(struct tcp_connection* c)
 
 		uint16_t msglen = ntoh16(buf) + 2 - 9;
 		uint16_t msgid = ntoh16(buf + 6) ;
-		int userid = ntoh32(buf + 9) ;
 		//check message
 		msg = tcpmsg_getbyid(msgid,msglen,TPD_USERID,c->_id._i64,TPD_IP);
 		if(msg == NULL)
