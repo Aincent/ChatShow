@@ -47,11 +47,24 @@ int set_serverkey(const char* key,const char* table,int svrid)
 
 
 ///////////////////////////////////////////////////////////////////////////
+
 void handle_usermsg_login(handler_msg* msg,void* user_group)
 {
 	char* message = (char*)MSGINFO_FIELD(msg,0);
 	tcp_stream* info = (tcp_stream*)msg->_data;
-//	struct user_account* user = _load_user_cache(name,user_group);
+	char mess[32] = {0};
+	strncpy(mess,message,31);
+	info->_len = sprintf(info->_buf,"{\"items\":[{\"name\":\"3Agrirl\",\"img\":\"http://image.5442.com:82/2015/1007/03/5442.jpg!220.jpg\",\"isVip\":\"true\",\"%s\",\"World\",}]}",mess);
+	msg->_msgid = 0;
+	tcp_sendmsg(info->_netid,msg);
+}
+
+
+//void handle_usermsg_login(handler_msg* msg,void* user_group)
+//{
+//	char* message = (char*)MSGINFO_FIELD(msg,0);
+//	tcp_stream* info = (tcp_stream*)msg->_data;
+//	struct user_account* user = _load_user_cache(message,user_group);
 //	int result,n;
 //	uint32_t t = get_mytime();
 //	char pswd[128]="";
@@ -82,7 +95,7 @@ void handle_usermsg_login(handler_msg* msg,void* user_group)
 //		info->_len = sprintf(info->_buf,"{\"msg\":%d,\"result\":%d,\"id\":0,\"key\":\"\",\"time\":%u}",
 //				USERMSG_LOGIN_BACK,result,result==2?t:0);
 //	}
-	msg->_msgid = 0;
+//	msg->_msgid = 0;
 //	USERLOG("%s [login]name=%s,result=%d,ip=%s",get_log_date(),user->_name,result,to_strip(info->_ip));
-	tcp_sendmsg(info->_netid,msg);
-}
+//	tcp_sendmsg(info->_netid,msg);
+//}
