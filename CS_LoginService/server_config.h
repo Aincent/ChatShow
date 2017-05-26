@@ -42,6 +42,14 @@ int config_db_type(void*,int no);
 int config_db_concount(void*,int no);
 
 //////////////////////////////////////////////////////
+
+int is_config_gate(void* f,int no);
+int config_gate_svrid(void* f,int no);
+const char* config_gate_ip(void* f,int no);
+int config_gate_port(void* f,int no);
+int config_gate_protocol(void* f,int no);
+
+/////////////////////////////////////////////////////
 int config_tcp_handlers_count(void*);
 
 int is_config_master(void*);

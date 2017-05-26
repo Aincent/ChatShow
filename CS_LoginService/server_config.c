@@ -97,6 +97,7 @@ int config_db_port(void* f,int no)
 	sprintf(session,"dblib%d",no);
 	return get_value_int(f,session,"db_port",0);
 }
+
 const char* config_db_user(void* f,int no)
 {
 	char session[32];
@@ -122,6 +123,42 @@ int config_db_concount(void* f,int no)
 	return get_value_int(f,session,"db_concount",0);
 }
 
+//////////////////////////////////////////////////////
+
+int is_config_gate(void* f,int no)
+{
+	char session[32];
+	sprintf(session,"gate%d",no);
+	return is_ini_session(f,session);
+}
+
+int config_gate_svrid(void* f,int no)
+{
+	char session[32];
+	sprintf(session,"gate%d",no);
+	return get_value_int(f,session,"svrid",0);
+}
+
+const char* config_gate_ip(void* f,int no)
+{
+	char session[32];
+	sprintf(session,"gate%d",no);
+	return get_value_string(f,session,"ip","0.0.0.0");
+}
+
+int config_gate_port(void* f,int no)
+{
+	char session[32];
+	sprintf(session,"gate%d",no);
+	return get_value_int(f,session,"port",7000);
+}
+
+int config_gate_protocol(void* f,int no)
+{
+	char session[32];
+	sprintf(session,"gate%d",no);
+	return get_value_int(f,session,"protocol",1);
+}
 
 //////////////////////////////////////////////////////
 int config_tcp_handlers_count(void* f)

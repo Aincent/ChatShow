@@ -157,7 +157,7 @@ handler_msg* tcpmsg_getbyid(int msgid,int msglen,uint64_t userid,uint64_t netid,
 	struct tcpmsg_table* t = _g_tcpmsg_list->_tables[msgid];
 	if(t)
 	{
-		if(msglen < t->_min_size  || msglen > t->_max_size)
+		if(t->_n > 0 && (msglen < t->_min_size  || msglen > t->_max_size))
 			return NULL;
 		return	create_tcpstream(userid,msgid,msglen,t,t->_n,netid,ip);
 	}
@@ -180,7 +180,7 @@ handler_msg* tcpmsg_getbykey(const char* key1,const char* key2,int msglen,uint64
 	{
 		return NULL;
 	}
-	if(msglen < t->_min_size  || msglen > t->_max_size)
+	if(t->_n > 0 && (msglen < t->_min_size  || msglen > t->_max_size))
 	{
 		return NULL;
 	}
@@ -244,12 +244,42 @@ int tcpmsg_putout_range(handler_msg* msg,char* addmsg,int addlen)
 		{
 			n =  s->_len-s->_off;
 			memcpy(s->_buf+s->_off, addmsg, n);
+		}
+		else
+		{
+			n = 0;
+		}
+
+		s->_off = 0;
+		((struct tcpmsg_table*)(s->_tb))->_domsg_f(msg,msg->_userid,s->_netid);
+		return n;//>=0
+	}
+	else if(addlen > 0)
+	{
+		memcpy(s->_buf+s->_off, addmsg, addlen);
+		s->_off += addlen;
+		return -1;
+	}
+	return -1;
+}
+
+int httpmsg_putout_range(handler_msg* msg,char* addmsg,int addlen)
+{
+	ASSERT(addlen >= 0);
+	int n;
+	tcp_stream* s = (tcp_stream*)msg->_data;
+	if(s->_len - s->_off <= addlen)
+	{
+		if(addmsg)
+		{
+			n =  s->_len-s->_off;
+			memcpy(s->_buf+s->_off, addmsg, n);
 		} else { n = 0;}
 		s->_off = 0;
-//		if(parse_stringmsg(s) == -1)
-//		{
-//			return -2;
-//		}
+		if(parse_stringmsg(s) == -1)
+		{
+			return -2;
+		}
 		((struct tcpmsg_table*)(s->_tb))->_domsg_f(msg,msg->_userid,s->_netid);
 		return n;//>=0
 	}

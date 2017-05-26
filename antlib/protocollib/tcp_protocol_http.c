@@ -33,7 +33,7 @@ int _http_readed_get(struct tcp_connection* c)
 	{
 		return -1;
 	}
-	if(-2 == tcpmsg_putout_range(msg,values,result))
+	if(-2 == httpmsg_putout_range(msg,values,result))
 	{
 		free_handler_msg(msg);
 		return -1;
@@ -73,7 +73,7 @@ int _htt_readed_post(struct tcp_connection* c)
 		TPD_MSGOFF = 0;
 		TPD_MSG = msg;
 	}
-	result = tcpmsg_putout_range(msg,c->_buf+TPD_MSGBEGIN,c->_offset-TPD_MSGBEGIN);
+	result = httpmsg_putout_range(msg,c->_buf+TPD_MSGBEGIN,c->_offset-TPD_MSGBEGIN);
 	if(result >= 0)
 	{
 		TPD_MSGBEGIN += result;

@@ -99,7 +99,6 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 			break;
 		}
 	case CONN_GATE_INFO:
-//		handle_usermsg_login(msg,g);
 		{
 			tcp_stream* info = (tcp_stream*)msg->_data;
 			struct gate_service_config* _g_server_config = (struct gate_service_config*)g;

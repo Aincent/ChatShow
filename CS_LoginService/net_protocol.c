@@ -40,6 +40,5 @@ void init_netprotocol()
 	// http://url/user/login?name=admin&password=123456&type=1
 	TCPMSG_REGITST_STRING("user","login",USERMSG_LOGIN,do_user_netmsg);
 
-	struct pm_tcpmsg_field gatemsg[1] = {{"userid",1,1,32}};
-	tcpmsg_regist_binary(CONN_GATE_INFO,gatemsg,1,do_gate_netmsg);
+	tcpmsg_regist_binary(CONN_GATE_INFO,NULL,0,do_gate_netmsg);
 }

@@ -44,7 +44,6 @@ int init_server(int* running)
 	init_handlerlib(config_server_id(config),config_handlers_count(config));
 	create_handlers_group(1,config_tcp_threads_count(config));
 	create_handlers_group(2,config_work_threads_count(config));
-	create_handlers_group(3,config_work_threads_count(config));
 	//log
 	init_loglib(2,config_log_level(config),config_log_prev(config));
 	//net
@@ -52,37 +51,42 @@ int init_server(int* running)
 	//protocol
 	init_protocollib();
 
-	gate_server_init(3);
+	gate_server_init(2);
 
 	init_netprotocol();
 
-	gate_service_conn(1,"0.0.0.0",7000,1);
+	int i;
+	for(i = 0; i < GATE_SERVICER_NUM; i ++)
+	{
+		if(is_config_gate(config,i) != 0)
+		{
+			continue;
+		}
 
-//	if(is_config_cmd(config) == 0)
-//	{
-//		const char* ip = config_cmd_ip(config);
-//		int port = config_cmd_port(config);
-//		int protocol = config_cmd_protocol(config);
-//		if(0 != bind_tcpprotocol(ip,port,protocol))
-//		{
-//			return -1;
-//		}
-//	}
-//	int i;
-//	for(i = 0; i < 128; i++)
-//	{
-//		if(0 != is_config_user(config,i))
-//		{
-//			continue;
-//		}
-//		const char* ip = config_user_ip(config,i);
-//		int port = config_user_port(config,i);
-//		int protocol = config_user_protocol(config,i);
-//		if(0 != bind_tcpprotocol(ip,port,protocol))
-//		{
-//			return -1;
-//		}
-//	}
+		int svrid = config_gate_svrid(config,i);
+		const char* ip = config_gate_ip(config,i);
+		int port = config_gate_port(config,i);
+		int protocol = config_gate_protocol(config,i);
+
+		gate_service_conn(svrid,ip,port,protocol);
+	}
+
+
+
+	for(i = 0; i < 128; i++)
+	{
+		if(0 != is_config_user(config,i))
+		{
+			continue;
+		}
+		const char* ip = config_user_ip(config,i);
+		int port = config_user_port(config,i);
+		int protocol = config_user_protocol(config,i);
+		if(0 != bind_tcpprotocol(ip,port,protocol))
+		{
+			return -1;
+		}
+	}
 
 //	if(is_config_db(config,0) == 0)
 //	{
@@ -93,12 +97,12 @@ int init_server(int* running)
 //		return -1;
 //	}
 
-//	userlist_init(2,config_server_user_poolsize(config));
-//	if(set_serverkey(config_server_userkey(config),config_server_usertable(config),
-//			config_server_userserverid(config)) == -1)
-//	{
-//		return -1;;
-//	}
+	userlist_init(2,config_server_user_poolsize(config));
+	if(set_serverkey(config_server_userkey(config),config_server_usertable(config),
+			config_server_userserverid(config)) == -1)
+	{
+		return -1;;
+	}
 
 	close_server_config(config);
 	return 0;
