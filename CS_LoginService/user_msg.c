@@ -7,6 +7,7 @@
 #include "user_msg.h"
 #include "server_db.h"
 #include "user_list.h"
+#include "gate_server.h"
 
 struct user_server
 {
@@ -45,6 +46,36 @@ int set_serverkey(const char* key,const char* table,int svrid)
 	return 0;
 }
 
+struct user_account* _load_user_cache(char* name,void* g)
+{
+	to_smallwords(name);
+	struct user_account* user = get_user_byname(name,g);
+	if(NULL == user)
+	{
+		user = get_user_cache(g);
+		strncpy(user->_name,name,31);
+		user->_state = -1;
+
+//		char sql[256];
+//		int n = snprintf(sql,sizeof(sql),"select pswd,state,id from %s where name='%s'",_g_user_server._table,name);
+//
+//		mydb* db = get_mydb(0);
+//		mydb_recordset* rset = get_recordset(db,sql,n);
+//		if(rset)
+//		{
+//			if(rset->_row_num > 0)
+//			{
+//				strncpy(user->_password,DBFIELD_STRING(db,rset,0),32);
+//				user->_state = (char)DBFIELD_INT(db,rset,1);
+//				user->_id =  DBFIELD_UINT64(db,rset,2);
+//			}
+//			back_recordset(db,rset);
+//		}
+
+		add_user(user,g);
+	}
+	return user;
+}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -52,50 +83,19 @@ void handle_usermsg_login(handler_msg* msg,void* user_group)
 {
 	char* message = (char*)MSGINFO_FIELD(msg,0);
 	tcp_stream* info = (tcp_stream*)msg->_data;
-	char mess[32] = {0};
-	strncpy(mess,message,31);
-	info->_len = sprintf(info->_buf,"{\"items\":[{\"name\":\"3Agrirl\",\"img\":\"http://image.5442.com:82/2015/1007/03/5442.jpg!220.jpg\",\"isVip\":\"true\",\"%s\",\"World\",}]}",mess);
-	msg->_msgid = 0;
-	tcp_sendmsg(info->_netid,msg);
+	struct user_account* user = _load_user_cache(message,user_group);
+	if(user)
+	{
+		user->_netid = info->_netid;
+		gate_service_call(info->_buf,info->_len);
+	}
+	else
+	{
+		char mess[32] = {0};
+		strncpy(mess,message,31);
+		info->_len = sprintf(info->_buf,"{\"%s\"",mess);
+		msg->_msgid = 1025;
+
+		tcp_sendmsg(info->_netid,msg);
+	};
 }
-
-
-//void handle_usermsg_login(handler_msg* msg,void* user_group)
-//{
-//	char* message = (char*)MSGINFO_FIELD(msg,0);
-//	tcp_stream* info = (tcp_stream*)msg->_data;
-//	struct user_account* user = _load_user_cache(message,user_group);
-//	int result,n;
-//	uint32_t t = get_mytime();
-//	char pswd[128]="";
-//	//0 OK,1 password error,2 user limit used,3 user not exist
-//	if(user->_state == -1)
-//	{
-//		result = 3;
-//	} else if(user->_time > t) {
-//		result = 2;
-//		t = user->_time - t;
-//	} else {
-//		MYMD5_ENCRYPT2((uint8_t*)user->_name,strlen(user->_name),(uint8_t*)password,strlen(password),pswd);
-//		if(memcmp(user->_password,pswd,32) == 0)
-//		{
-//			n = sprintf(pswd,"%s:%lu:%u",_g_user_server._key,user->_id,t);
-//			MD5((uint8_t*)pswd,n,pswd);
-//			result = 0;
-//		} else { result = 1; }
-//	}
-//	//
-//	if(result == 0)
-//	{
-//		info->_len = sprintf(info->_buf,"{\"msg\":%d,\"result\":0,\"id\":%lu,\"key\":\"%s\",\"time\":%u}",
-//				USERMSG_LOGIN_BACK,user->_id,pswd,t);
-//	}
-//	else
-//	{
-//		info->_len = sprintf(info->_buf,"{\"msg\":%d,\"result\":%d,\"id\":0,\"key\":\"\",\"time\":%u}",
-//				USERMSG_LOGIN_BACK,result,result==2?t:0);
-//	}
-//	msg->_msgid = 0;
-//	USERLOG("%s [login]name=%s,result=%d,ip=%s",get_log_date(),user->_name,result,to_strip(info->_ip));
-//	tcp_sendmsg(info->_netid,msg);
-//}

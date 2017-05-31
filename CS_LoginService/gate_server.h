@@ -21,4 +21,7 @@ void gate_server_init(int handler_group);
 uint32_t gate_server_handlerid();
 
 int gate_service_conn(int svrid,const char* ip,int port,int protocol_type);
+
+void gate_service_call(char* message,int len);
+
 #endif /* GATE_SERVER_H_ */

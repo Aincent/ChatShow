@@ -56,6 +56,20 @@ void __push_gate_server_netid(uint32_t _handlerid,uint64_t netid)
 	}
 }
 
+uint64_t _pop_gate_server_netid()
+{
+	ASSERT(_g_server_list != NULL);
+	int i = 0;
+	for(; i < GATE_SERVICER_NUM ; i++)
+	{
+		struct gate_service_config* g  = &(_g_server_list->_list[i]);
+		if(g->_isuse == 1)
+		{
+			return g->_netid;
+		}
+	}
+}
+
 void*  _pop_gate_server_handlerid()
 {
 	ASSERT(_g_server_list != NULL);
@@ -91,11 +105,13 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 			destory_packet(packet);
 			tcp_sendmsg(msg->_userid,hmsg);
 
+//			free_handler_msg(msg);
 			break;
 		}
 	case TCPCONNECT_LOST_MSGID:
 		{
 			printf("connect error ... %d \n", hid);
+			free_handler_msg(msg);
 			break;
 		}
 	case CONN_GATE_INFO:
@@ -103,8 +119,16 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 			tcp_stream* info = (tcp_stream*)msg->_data;
 			struct gate_service_config* _g_server_config = (struct gate_service_config*)g;
 			printf("Hello ....msgid = %d  netid = %lld _handlerid = %d  hid = %d \n",msg->_msgid, info->_netid,_g_server_config->_handlerid,hid);
-			printf("%d \n", ntoh32(info->_buf));
-			printf("%d \n", *((uint32_t*)(info->_buf)));
+			int port = ntoh32(info->_buf);
+			int len = ntoh32(info->_buf+4);
+			char ip[32] = {0};
+			memcpy(ip,info->_buf+8,len);
+
+			printf("%d \n", port);
+			printf("%d \n", len);
+			printf("%s \n", ip);
+
+//			free_handler_msg(msg);
 			break;
 		}
 	}
@@ -150,4 +174,23 @@ int gate_service_conn(int svrid,const char* ip,int port,int protocol_type)
 	conn_tcpprotocol(svrid,addr,port,packet->_buf,packet->_off,0,g->_handlerid,protocol_type);
 	destory_packet(packet);
 	return 0;
+}
+
+void gate_service_call(char* message,int len)
+{
+	ASSERT(_g_server_list != NULL);
+
+	tcp_packet* packet = create_packet(CONN_GATE_INFO);
+	push_packet_int32(packet,3305);
+	push_packet_int32(packet,len);
+	push_packet_str(packet,message,len);
+	push_packet_end(packet);
+
+	handler_msg* hmsg = create_handler_msg(packet->_off);
+	hmsg->_datalen = packet->_off;
+	memcpy(hmsg->_data,packet->_buf,packet->_off);
+
+	destory_packet(packet);
+
+	tcp_sendmsg(_pop_gate_server_netid(),hmsg);
 }

@@ -14,6 +14,7 @@
 
 struct user_account
 {
+	uint64_t _netid;
 	uint64_t _id;
 	uint32_t _time;
 	uint32_t _lastused;

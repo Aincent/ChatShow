@@ -97,6 +97,7 @@ handler_msg* create_handler_msg(int size)
 void free_handler_msg(handler_msg* msg)
 {
 	int n = LOCK_SUB(((struct handler_msg_cache*)msg)->_used,1);
+	printf("free_handler_msg msgid = %d, n = %d \n", msg->_msgid,((struct handler_msg_cache*)msg)->_used);
 	ASSERT(n >= 0);
 	if(n <= 0) {
 		_destory_msgcache((struct handler_msg_cache*)msg);
@@ -106,6 +107,7 @@ void free_handler_msg(handler_msg* msg)
 void add_handler_msg_used(handler_msg* msg,int add)
 {
 	LOCK_ADD(((struct handler_msg_cache*)msg)->_used,add);
+	printf("add_handler_msg_used msgid = %d, n = %d \n", msg->_msgid,((struct handler_msg_cache*)msg)->_used);
 }
 
 void reset_handler_msg_data(handler_msg* msg)
