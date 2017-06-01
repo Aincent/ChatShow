@@ -8,6 +8,7 @@
 #include "protocollib/tcp_stream.h"
 #include "packet.h"
 #include "protocollib/tcp_protocol.h"
+#include "user_list.h"
 
 struct gate_service_config
 {
@@ -68,6 +69,8 @@ uint64_t _pop_gate_server_netid()
 			return g->_netid;
 		}
 	}
+
+	return 0;
 }
 
 void*  _pop_gate_server_handlerid()
@@ -94,16 +97,16 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 		{
 			struct tcp_connect_data* data = (struct tcp_connect_data*)msg->_data;
 			__push_gate_server_netid(data->_user_handlerid, msg->_userid);
-			printf("connect success .......netid = %lld _handlerid = %d \n", msg->_userid,data->_user_handlerid);
+			printf("connect success .......netid = %ld _handlerid = %d \n", msg->_userid,data->_user_handlerid);
 
-			tcp_packet* packet = create_packet(CONN_GATE_INFO);
-			push_packet_int32(packet,3305);
-			push_packet_end(packet);
-			handler_msg* hmsg = create_handler_msg(packet->_off);
-			hmsg->_datalen = packet->_off;
-			memcpy(hmsg->_data,packet->_buf,packet->_off);
-			destory_packet(packet);
-			tcp_sendmsg(msg->_userid,hmsg);
+//			tcp_packet* packet = create_packet(CONN_GATE_INFO);
+//			push_packet_int32(packet,3305);
+//			push_packet_end(packet);
+//			handler_msg* hmsg = create_handler_msg(packet->_off);
+//			hmsg->_datalen = packet->_off;
+//			memcpy(hmsg->_data,packet->_buf,packet->_off);
+//			destory_packet(packet);
+//			tcp_sendmsg(msg->_userid,hmsg);
 
 //			free_handler_msg(msg);
 			break;
@@ -118,17 +121,27 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 		{
 			tcp_stream* info = (tcp_stream*)msg->_data;
 			struct gate_service_config* _g_server_config = (struct gate_service_config*)g;
-			printf("Hello ....msgid = %d  netid = %lld _handlerid = %d  hid = %d \n",msg->_msgid, info->_netid,_g_server_config->_handlerid,hid);
-			int port = ntoh32(info->_buf);
-			int len = ntoh32(info->_buf+4);
+			printf("Hello ....msgid = %d  netid = %ld _handlerid = %d  hid = %d \n",msg->_msgid, info->_netid,_g_server_config->_handlerid,hid);
+			int len = pop_tcpstream_int32(info);
+			char name[32] = {0};
+			pop_tcpstream_str(info,name,len);
+			int port = pop_tcpstream_int32(info);
+			len = pop_tcpstream_int32(info);
 			char ip[32] = {0};
-			memcpy(ip,info->_buf+8,len);
+			pop_tcpstream_str(info,ip,len);
 
+			printf("%s \n", name);
 			printf("%d \n", port);
 			printf("%d \n", len);
 			printf("%s \n", ip);
+			uint64_t netid = pop_user_netid_byname(name);
+			if(netid > 0)
+			{
+				info->_len = sprintf(info->_buf,"{\"msg\":%s,\"ip\":%s,\"port\":%d}",name,ip,port);
+				msg->_msgid = 0;
+				tcp_sendmsg(netid,msg);
+			}
 
-//			free_handler_msg(msg);
 			break;
 		}
 	}

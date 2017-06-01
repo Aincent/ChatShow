@@ -10,8 +10,8 @@
 #include "user_msg.h"
 #include "gate_server.h"
 
-#define TCPMSG_REGITST_STRING(path,name,msgid,fun) struct pm_tcpmsg_field message[1] = {{"message",0,3,32}};\
-	tcpmsg_regist_string(path,name,msgid,message,1,fun);
+//#define TCPMSG_REGITST_STRING(path,name,msgid,fun) struct pm_tcpmsg_field message[1] = {{"message",0,3,32}};\
+//	tcpmsg_regist_string(path,name,msgid,message,1,fun);
 
 //check message then add to handler
 void do_user_netmsg(handler_msg* msg,uint64_t userid,uint64_t netid)
@@ -38,7 +38,16 @@ void do_gate_netmsg(handler_msg* msg,uint64_t userid,uint64_t netid)
 void init_netprotocol()
 {
 	// http://url/user/login?name=admin&password=123456&type=1
-	TCPMSG_REGITST_STRING("user","login",USERMSG_LOGIN,do_user_netmsg);
+
+//	TCPMSG_REGITST_STRING("user","login",USERMSG_LOGIN,do_user_netmsg);
+	struct pm_tcpmsg_field message[1] = {{"message",0,3,33}};
+	tcpmsg_regist_string("user","login",USERMSG_LOGIN,message,1,do_user_netmsg);
+
+	struct pm_tcmpsg_field signup[2] = {{"name",0,3,33},{"password",0,6,33}};
+	tcpmsg_regist_string("user","register",USERMSG_REGISTER,signup,2,do_user_netmsg);
+
+	struct pm_tcpmsg_field password[3] = {{"name",0,3,33},{"password",0,6,33},{"newpassword",0,6,33}};
+	tcpmsg_regist_string("user","password",USERMSG_PASSWORD,password,3,do_user_netmsg);
 
 	tcpmsg_regist_binary(CONN_GATE_INFO,NULL,0,do_gate_netmsg);
 }

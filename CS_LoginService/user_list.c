@@ -34,18 +34,12 @@ void user_account_domsg(handler_msg* msg,void* g,uint32_t hid)
 	case USERMSG_LOGIN:
 		handle_usermsg_login(msg,g);
 		break;
-//	case USERMSG_CHECK:
-//		handle_usermsg_check(msg,g);
-//		break;
-//	case USERMSG_ADD:
-//		handle_usermsg_add(msg,g);
-//		break;
-//	case USERMSG_UPDATE:
-//		handle_usermsg_update(msg,g);
-//		break;
-//	case USERMSG_UPDATEPASSWORD:
-//		handle_usermsg_updatepassword(msg,g);
-//		break;
+	case USERMSG_REGISTER:
+		handle_usermsg_register(msg,g);
+		break;
+	case USERMSG_PASSWORD:
+		handle_usermsg_password(msg,g);
+		break;
 	}
 }
 
@@ -202,6 +196,26 @@ struct user_account* get_user_byname(char* name,void* hdata)
 		u->_lastused = get_mytime();
 	}
 	return u;
+}
+
+
+uint64_t pop_user_netid_byname(char* name)
+{
+	uint64_t netid = 0;
+	if(-1 == _check_username(name))
+	{
+		return -1;
+	}
+	int index = _g_user_list->_name_word[(uint8_t)(*name)];
+	ASSERT(index >= 0 && index < USERLIST_NUM);
+	struct user_account* g = get_user_byname(name,(void*)&(_g_user_list->_list[index]));
+	if(g)
+	{
+		netid = g->_netid;
+		del_str_hash(&(_g_user_list->_list[index]._users),name);
+	}
+
+	return netid;
 }
 
 void add_user(struct user_account* u,void* hdata)

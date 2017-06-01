@@ -85,6 +85,7 @@ void tcp_resetbuf(struct tcp_connection* c,int begin,int end)
 	else
 	{
 		c->_offset = 0;
+		TPD_MSGBEGIN = 0;
 	}
 }
 

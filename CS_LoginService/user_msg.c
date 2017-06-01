@@ -53,7 +53,7 @@ struct user_account* _load_user_cache(char* name,void* g)
 	if(NULL == user)
 	{
 		user = get_user_cache(g);
-		strncpy(user->_name,name,31);
+		strncpy(user->_name,name,33);
 		user->_state = -1;
 
 //		char sql[256];
@@ -86,16 +86,87 @@ void handle_usermsg_login(handler_msg* msg,void* user_group)
 	struct user_account* user = _load_user_cache(message,user_group);
 	if(user)
 	{
+		printf("%s \n",message);
 		user->_netid = info->_netid;
-		gate_service_call(info->_buf,info->_len);
+		gate_service_call(message,strlen(message) +1);
 	}
 	else
 	{
-		char mess[32] = {0};
-		strncpy(mess,message,31);
+		char mess[33] = {0};
+		strncpy(mess,message,33);
 		info->_len = sprintf(info->_buf,"{\"%s\"",mess);
 		msg->_msgid = 1025;
 
 		tcp_sendmsg(info->_netid,msg);
 	};
+}
+
+
+void handle_usermsg_register(handler_msg* msg,void* user_group)
+{
+	char* name = (char*)MSGINFO_FIELD(msg,0);
+	char* password = (char*)MSGINFO_FIELD(msg,1);
+	int result = 1;
+	char pswd[33];
+	tcp_stream* info = (tcp_stream*)msg->_data;
+
+	char sql[256];
+	int n = snprintf(sql,sizeof(sql),"select pswd,state,id from %s where name='%s'",_g_user_server._table,name);
+
+	mydb* db = get_mydb(0);
+	mydb_recordset* rset = get_recordset(db,sql,n);
+	if(rset)
+	{
+		if(rset->_row_num > 0)
+		{
+			result = 0;
+		}
+		back_recordset(db,rset);
+	}
+
+	if(result == 0)
+	{
+		MYMD5_ENCRYPT2((uint8_t*)name,strlen(name),(uint8_t*)password,strlen(password),pswd);
+		int n = snprintf(sql,sizeof(sql),"insert into %s (name,pswd,state) values (\'%s\',\'%s\',0)",
+				_g_user_server._table,name,pswd);
+
+		mydb* db = get_mydb(0);
+		if(0 == do_sql(db,sql,n))
+		{
+			result = 0;
+		}
+		else
+		{
+			result = 1;
+		}
+	}
+
+
+	info->_len = sprintf(info->_buf,"{\"result\":%d}",result);
+	msg->_msgid = 0;
+	tcp_sendmsg(info->_netid,msg);
+}
+
+void handle_usermsg_password(handler_msg* msg,void* user_group)
+{
+	char* name = (char*)MSGINFO_FIELD(msg,0);
+	char* password = (char*)MSGINFO_FIELD(msg,1);
+	char* newpassword = (char*)MSGINFO_FIELD(msg,2);
+	char pswd[33];
+	int result = 1;
+	tcp_stream* info = (tcp_stream*)msg->_data;
+	MYMD5_ENCRYPT2((uint8_t*)name,strlen(name),(uint8_t*)password,strlen(password),pswd);
+
+	char sql[256];
+	MYMD5_ENCRYPT2((uint8_t*)name,strlen(name),(uint8_t*)newpassword,strlen(newpassword),pswd);
+	int n = snprintf(sql,sizeof(sql),"update %s set pswd=\'%s\' where name=\'%s\';",_g_user_server._table,pswd,name);
+	mydb* db = get_mydb(0);
+	if(0 == do_sql(db,sql,n))
+	{
+		result = 0;
+	}
+
+	info->_len = sprintf(info->_buf,"{\"result\":%d}",result);
+	msg->_msgid = 0;
+	tcp_sendmsg(info->_netid,msg);
 }
