@@ -43,7 +43,7 @@ void init_netprotocol()
 	struct pm_tcpmsg_field message[1] = {{"message",0,3,33}};
 	tcpmsg_regist_string("user","login",USERMSG_LOGIN,message,1,do_user_netmsg);
 
-	struct pm_tcmpsg_field signup[2] = {{"name",0,3,33},{"password",0,6,33}};
+	struct pm_tcpmsg_field signup[2] = {{"name",0,3,33},{"password",0,6,33}};
 	tcpmsg_regist_string("user","register",USERMSG_REGISTER,signup,2,do_user_netmsg);
 
 	struct pm_tcpmsg_field password[3] = {{"name",0,3,33},{"password",0,6,33},{"newpassword",0,6,33}};

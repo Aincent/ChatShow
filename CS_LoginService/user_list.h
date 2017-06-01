@@ -20,8 +20,8 @@ struct user_account
 	uint32_t _lastused;
 	uint8_t _count;
 	char _state;
-	char _name[32];
-	char _password[32];
+	char _name[33];
+	char _password[33];
 };
 
 

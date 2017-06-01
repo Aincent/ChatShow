@@ -52,27 +52,28 @@ struct user_account* _load_user_cache(char* name,void* g)
 	struct user_account* user = get_user_byname(name,g);
 	if(NULL == user)
 	{
-		user = get_user_cache(g);
-		strncpy(user->_name,name,33);
-		user->_state = -1;
+		char sql[256];
+		int n = snprintf(sql,sizeof(sql),"select psd,state,id from %s where name='%s'",_g_user_server._table,name);
 
-//		char sql[256];
-//		int n = snprintf(sql,sizeof(sql),"select pswd,state,id from %s where name='%s'",_g_user_server._table,name);
-//
-//		mydb* db = get_mydb(0);
-//		mydb_recordset* rset = get_recordset(db,sql,n);
-//		if(rset)
-//		{
-//			if(rset->_row_num > 0)
-//			{
-//				strncpy(user->_password,DBFIELD_STRING(db,rset,0),32);
-//				user->_state = (char)DBFIELD_INT(db,rset,1);
-//				user->_id =  DBFIELD_UINT64(db,rset,2);
-//			}
-//			back_recordset(db,rset);
-//		}
+		mydb* db = get_mydb(0);
+		mydb_recordset* rset = get_recordset(db,sql,n);
+		if(rset)
+		{
+			if(rset->_row_num > 0)
+			{
+				user = get_user_cache(g);
+				strncpy(user->_name,name,33);
+				user->_state = -1;
 
-		add_user(user,g);
+				strncpy(user->_password,DBFIELD_STRING(db,rset,0),32);
+				user->_state = (char)DBFIELD_INT(db,rset,1);
+				user->_id =  DBFIELD_UINT64(db,rset,2);
+
+				add_user(user,g);
+			}
+			back_recordset(db,rset);
+		}
+
 	}
 	return user;
 }
@@ -111,7 +112,7 @@ void handle_usermsg_register(handler_msg* msg,void* user_group)
 	tcp_stream* info = (tcp_stream*)msg->_data;
 
 	char sql[256];
-	int n = snprintf(sql,sizeof(sql),"select pswd,state,id from %s where name='%s'",_g_user_server._table,name);
+	int n = snprintf(sql,sizeof(sql),"select psd,state,id from %s where name='%s'",_g_user_server._table,name);
 
 	mydb* db = get_mydb(0);
 	mydb_recordset* rset = get_recordset(db,sql,n);
@@ -124,20 +125,16 @@ void handle_usermsg_register(handler_msg* msg,void* user_group)
 		back_recordset(db,rset);
 	}
 
-	if(result == 0)
+	if(result == 1)
 	{
 		MYMD5_ENCRYPT2((uint8_t*)name,strlen(name),(uint8_t*)password,strlen(password),pswd);
-		int n = snprintf(sql,sizeof(sql),"insert into %s (name,pswd,state) values (\'%s\',\'%s\',0)",
+		int n = snprintf(sql,sizeof(sql),"insert into %s (name,psd,state) values (\'%s\',\'%s\',0)",
 				_g_user_server._table,name,pswd);
 
 		mydb* db = get_mydb(0);
 		if(0 == do_sql(db,sql,n))
 		{
 			result = 0;
-		}
-		else
-		{
-			result = 1;
 		}
 	}
 
@@ -159,7 +156,7 @@ void handle_usermsg_password(handler_msg* msg,void* user_group)
 
 	char sql[256];
 	MYMD5_ENCRYPT2((uint8_t*)name,strlen(name),(uint8_t*)newpassword,strlen(newpassword),pswd);
-	int n = snprintf(sql,sizeof(sql),"update %s set pswd=\'%s\' where name=\'%s\';",_g_user_server._table,pswd,name);
+	int n = snprintf(sql,sizeof(sql),"update %s set psd=\'%s\' where name=\'%s\';",_g_user_server._table,pswd,name);
 	mydb* db = get_mydb(0);
 	if(0 == do_sql(db,sql,n))
 	{

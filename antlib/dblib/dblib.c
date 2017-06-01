@@ -87,6 +87,7 @@ mydb* open_mydb(int dbtype,const char* sip,int port,const char* dbname,
 		con = _create_dbconnection(db);
 		ASSERT(con);
 		con->_used = 0;
+		con->_state = 1;
 		double_list_push(&db->_con_list,&con->_node);
 	}
 	return db;
