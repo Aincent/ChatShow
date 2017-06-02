@@ -78,7 +78,7 @@ mydb* open_mydb(int dbtype,const char* sip,int port,const char* dbname,
 	strncpy(db->_connect_data._dbpswd,pswd,sizeof(db->_connect_data._dbpswd)-1);
 	db->_connect_data._dbport = port;
 	db->_contype = con_type;
-	db->_max_unused_time = 3600;
+	db->_max_unused_time = 365*24*3600;
 
 	int i = 0;
 	struct db_connection* con;

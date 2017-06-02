@@ -95,7 +95,7 @@ void handle_usermsg_login(handler_msg* msg,void* user_group)
 	{
 		char mess[33] = {0};
 		strncpy(mess,message,33);
-		info->_len = sprintf(info->_buf,"{\"%s\"",mess);
+		info->_len = sprintf(info->_buf,"{\"%s\"}",mess);
 		msg->_msgid = 1025;
 
 		tcp_sendmsg(info->_netid,msg);

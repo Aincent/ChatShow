@@ -192,7 +192,9 @@ int gate_service_conn(int svrid,const char* ip,int port,int protocol_type)
 void gate_service_call(char* message,int len)
 {
 	ASSERT(_g_server_list != NULL);
-
+	uint64_t netid = _pop_gate_server_netid();
+	if(netid <= 0)
+		return;
 	tcp_packet* packet = create_packet(CONN_GATE_INFO);
 	push_packet_int32(packet,3305);
 	push_packet_int32(packet,len);
@@ -205,5 +207,5 @@ void gate_service_call(char* message,int len)
 
 	destory_packet(packet);
 
-	tcp_sendmsg(_pop_gate_server_netid(),hmsg);
+	tcp_sendmsg(netid,hmsg);
 }

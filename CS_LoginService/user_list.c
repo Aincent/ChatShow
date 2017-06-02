@@ -178,7 +178,7 @@ void free_user_cache(struct user_account* ua)
 struct user_account* get_user_byname(char* name,void* hdata)
 {
 	struct user_account_group* g = (struct user_account_group*)hdata;
-	struct user_account* u = get_str_hash(&g->_users,(const char*)(name+1));
+	struct user_account* u = get_str_hash(&g->_users,(const char*)(name));
 	if(u){
 		uint32_t cur = get_mytime();
 		if(u->_time < cur)
@@ -222,6 +222,6 @@ void add_user(struct user_account* u,void* hdata)
 {
 	u->_lastused = get_mytime();
 	struct user_account_group* g = (struct user_account_group*)hdata;
-	int res = set_str_hash(&g->_users,u->_name+1,u);
+	int res = set_str_hash(&g->_users,u->_name,u);
 	ASSERT(res == 0);
 }
