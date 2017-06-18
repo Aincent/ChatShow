@@ -10,6 +10,64 @@
 #include "tcp_stream.h"
 #include "tcp_msglist.h"
 
+int _parse_net_tcp4msg(struct tcp_connection* c)
+{
+	handler_msg* msg = (handler_msg*)TPD_MSG;
+	if(msg == NULL)
+	{
+		//parse head
+		if(TPD_MSGBEGIN+26 > c->_offset)
+		{
+			return -1;
+		}
+		char* buf = c->_buf + TPD_MSGBEGIN;
+
+		uint32_t msglen = (*((int*)(buf)));
+		uint32_t msgid = (*((int*)(buf + 9)));
+//		uint32_t msglen = ntoh32(buf) - 26;
+//		uint32_t msgid = ntoh32(buf + 9) ;
+		//check message
+		msg = tcpmsg_getbyid(msgid,msglen,TPD_USERID,c->_id._i64,TPD_IP);
+		if(msg == NULL)
+		{
+			tcpconnection_close(c,"tcp4 error message");
+			return -1;
+		}
+		TPD_MSGBEGIN += 26;
+		//put out ,if only message head,
+		if(msglen == 0)
+		{
+			if(-2 == tcpmsg_putout_range(msg,NULL,0))
+			{
+				tcpconnection_close(c,"tcp4 parser error");
+				return -1;
+			}
+			return 0;
+		}
+		//record
+		TPD_MSG = msg;
+	}
+	//add message body range
+	if(msg && c->_offset > TPD_MSGBEGIN)
+	{
+		char* buf = c->_buf + TPD_MSGBEGIN;
+		int n = tcpmsg_putout_range(msg,buf,c->_offset-TPD_MSGBEGIN);
+		if(n >= 0)
+		{
+			TPD_MSG = NULL;
+			TPD_MSGBEGIN += n;
+			return 0;
+		}
+		else if(n == -2)
+		{
+			tcpconnection_close(c,"tcp4 parser error2");
+			return -1;
+		}
+		TPD_MSGBEGIN = c->_offset;
+	}
+	return -1;
+}
+
 int _parse_tcp4msg(struct tcp_connection* c)
 {
 	handler_msg* msg = (handler_msg*)TPD_MSG;
@@ -71,7 +129,9 @@ int _parse_tcp4msg(struct tcp_connection* c)
 void tcp4_readed_data(int add,struct tcp_connection* c)
 {
 	c->_offset += add;
-	while(_parse_tcp4msg(c) == 0)
+//	while(_parse_tcp4msg(c) == 0)
+
+	while(_parse_net_tcp4msg(c) == 0)
 	{ }
 	tcp_resetbuf(c,TPD_MSGBEGIN,c->_offset);
 }

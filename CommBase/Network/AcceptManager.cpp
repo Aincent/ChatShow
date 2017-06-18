@@ -37,8 +37,8 @@ namespace CommBaseOut
 		}
 
 		int nOpt = 1;
-   struct timeval timeo = {1, 0};
-   socklen_t tilen = sizeof(timeo);
+		struct timeval timeo = {1, 0};
+		socklen_t tilen = sizeof(timeo);
 
 		setsockopt(m_sockLis, SOL_SOCKET, SO_REUSEADDR, (const void*)&nOpt, sizeof(nOpt));
 		setsockopt(m_sockLis, SOL_SOCKET, SO_RCVTIMEO, &timeo, tilen);

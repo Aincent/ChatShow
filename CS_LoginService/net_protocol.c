@@ -9,6 +9,7 @@
 #include "antlib.h"
 #include "user_msg.h"
 #include "gate_server.h"
+#include "protocollib/tcp_protocol.h"
 
 //#define TCPMSG_REGITST_STRING(path,name,msgid,fun) struct pm_tcpmsg_field message[1] = {{"message",0,3,32}};\
 //	tcpmsg_regist_string(path,name,msgid,message,1,fun);
@@ -32,7 +33,11 @@ void do_user_netmsg(handler_msg* msg,uint64_t userid,uint64_t netid)
 
 void do_gate_netmsg(handler_msg* msg,uint64_t userid,uint64_t netid)
 {
-	send_handler_msg(gate_server_handlerid(netid),msg);
+	uint32_t handlerid = gate_server_handlerid(netid);
+	if(handlerid > 0)
+		send_handler_msg(gate_server_handlerid(netid),msg);
+	else
+		write_log("do_gate_netmsg handlerid = %d error",handlerid);
 }
 
 void init_netprotocol()
@@ -50,4 +55,8 @@ void init_netprotocol()
 	tcpmsg_regist_string("user","password",USERMSG_PASSWORD,password,3,do_user_netmsg);
 
 	tcpmsg_regist_binary(CONN_GATE_INFO,NULL,0,do_gate_netmsg);
+	tcpmsg_regist_binary(TCPCONNECT_MSGID,NULL,0,do_gate_netmsg);
+	tcpmsg_regist_binary(TCPCONNECT_LOST_MSGID,NULL,0,do_gate_netmsg);
+
+
 }

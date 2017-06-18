@@ -9,6 +9,7 @@
 #include "packet.h"
 #include "protocollib/tcp_protocol.h"
 #include "user_list.h"
+#include "net_packet.h"
 
 struct gate_service_config
 {
@@ -109,6 +110,8 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 //			tcp_sendmsg(msg->_userid,hmsg);
 
 //			free_handler_msg(msg);
+//			char s[] = "hello World !";
+//			gate_service_call(s,strlen(s));
 			break;
 		}
 	case TCPCONNECT_LOST_MSGID:
@@ -122,22 +125,28 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 			tcp_stream* info = (tcp_stream*)msg->_data;
 			struct gate_service_config* _g_server_config = (struct gate_service_config*)g;
 			printf("Hello ....msgid = %d  netid = %ld _handlerid = %d  hid = %d \n",msg->_msgid, info->_netid,_g_server_config->_handlerid,hid);
-			int len = pop_tcpstream_int32(info);
-			char name[32] = {0};
-			pop_tcpstream_str(info,name,len);
-			int port = pop_tcpstream_int32(info);
-			len = pop_tcpstream_int32(info);
+			int code = normal_pop_tcpstream_int32(info);
+			int port = normal_pop_tcpstream_int32(info);
+			uint16_t localID = normal_pop_tcpstream_int16(info);
+			int len = normal_pop_tcpstream_int32(info);
 			char ip[32] = {0};
 			pop_tcpstream_str(info,ip,len);
+			len = normal_pop_tcpstream_int32(info);
+			char name[32] = {0};
+			pop_tcpstream_str(info,name,len);
 
-			printf("%s \n", name);
-			printf("%d \n", port);
+			printf("code = %d \n",code);
+			printf("name = %s \n", name);
+			printf("port = %d \n", port);
+			printf("localID = %d \n", localID);
 			printf("%d \n", len);
-			printf("%s \n", ip);
-			uint64_t netid = pop_user_netid_byname(name);
+			printf("ip = %s \n", ip);
+			uint64_t charid = 0;
+			uint64_t netid = pop_user_netid_byname(name,&charid);
+			printf("charid =  %ld \n", charid);
 			if(netid > 0)
 			{
-				info->_len = sprintf(info->_buf,"{\"msg\":%s,\"ip\":%s,\"port\":%d}",name,ip,port);
+				info->_len = sprintf(info->_buf,"{\"msg\":%s,\"charid\":%ld,\"ip\":%s,\"port\":%d,\"localid\":%d}",name,charid,ip,port,localID);
 				msg->_msgid = 0;
 				tcp_sendmsg(netid,msg);
 			}
@@ -180,32 +189,44 @@ int gate_service_conn(int svrid,const char* ip,int port,int protocol_type)
 	uint32_t addr = INADDR_ANY;
 	if (ip&&ip[0]) {addr=inet_addr(ip);}
 
-	tcp_packet* packet = create_packet(CONN_GATE_INFO);
-	push_packet_int32(packet,3305);
-	push_packet_end(packet);
+//	tcp_packet* packet = create_packet(CONN_GATE_INFO);
+//	push_packet_int32(packet,3305);
+//	push_packet_end(packet);
+
+	net_packet* packet = create_net_packet(0,0);
+	push_net_packet_int8(packet,6);
+	push_net_packet_int16(packet,1);
+	push_net_packet_end(packet);
+
 	g->_isuse = 1;
 	conn_tcpprotocol(svrid,addr,port,packet->_buf,packet->_off,0,g->_handlerid,protocol_type);
-	destory_packet(packet);
+	destory_net_packet(packet);
 	return 0;
 }
 
-void gate_service_call(char* message,int len)
+void gate_service_call(uint64_t charid,char* name)
 {
 	ASSERT(_g_server_list != NULL);
 	uint64_t netid = _pop_gate_server_netid();
 	if(netid <= 0)
 		return;
-	tcp_packet* packet = create_packet(CONN_GATE_INFO);
-	push_packet_int32(packet,3305);
-	push_packet_int32(packet,len);
-	push_packet_str(packet,message,len);
-	push_packet_end(packet);
+//	tcp_packet* packet = create_packet(CONN_GATE_INFO);
+//	push_packet_int32(packet,3305);
+//	push_packet_int32(packet,len);
+//	push_packet_str(packet,message,len);
+//	push_packet_end(packet);
+
+	net_packet* packet = create_net_packet(CONN_GATE_INFO,2);
+	push_net_packet_int64(packet,charid);
+	push_net_packet_int32(packet,strlen(name));
+	push_net_packet_str(packet,name,strlen(name));
+	push_net_packet_end(packet);
 
 	handler_msg* hmsg = create_handler_msg(packet->_off);
 	hmsg->_datalen = packet->_off;
 	memcpy(hmsg->_data,packet->_buf,packet->_off);
 
-	destory_packet(packet);
+	destory_net_packet(packet);
 
 	tcp_sendmsg(netid,hmsg);
 }

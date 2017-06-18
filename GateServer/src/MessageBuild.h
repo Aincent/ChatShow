@@ -38,4 +38,6 @@ Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, string &conten
 
 Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, Safe_Smart_Ptr<CommBaseOut::Message> &message, int channel, int messageType = Ack, int timeOut = 10);
 
+Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, char *content, int len, int channel, int messageType = Ack, int timeOut = 10);
+
 #endif /* MESSAGEBUILD_H_ */

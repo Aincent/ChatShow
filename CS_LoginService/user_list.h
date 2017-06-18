@@ -31,7 +31,7 @@ void userlist_uninit();
 
 void pushmsg_byname(const char* name,handler_msg* msg);
 
-uint64_t pop_user_netid_byname(char* name);
+uint64_t pop_user_netid_byname(char* name,uint64_t *charid);
 struct user_account* get_user_cache(void*);
 void free_user_cache(struct user_account* ua);
 struct user_account* get_user_byname(char* name,void*);

@@ -11,7 +11,7 @@
 #include "util.h"
 #include "./Network/NetWorkConfig.h"
 #include "ServerManager.h"
-
+#include "CharactorMgr/CharactorLogin.h"
 
 CServiceMain::CServiceMain()
 {
@@ -55,7 +55,7 @@ int CServiceMain::InitFile()
 
 void CServiceMain::InitInstance()
 {
-//	CharactorLogin::GetInstance();
+	CharactorLogin::GetInstance();
 }
 
 void CServiceMain::Start()
@@ -124,6 +124,8 @@ void CServiceMain::Start()
 
 void CServiceMain::UnInit()
 {
+	CharactorLogin::GetInstance()->DestroyInstance();
+
 	ServerConHandler::GetInstance()->DestoryInstance();
 	CLoggerMT::GetInstance()->DestoryInstance();
 }

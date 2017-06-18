@@ -33,7 +33,7 @@ int init_server(int* running)
 	signal(SIGUSR2,signal_proc);
 	srand((unsigned int)time(0));
 	//
-	void* config = read_server_config("config.ini");
+	void* config = read_server_config("Config/config.ini");
 	if(NULL == config) {
 		return -1;
 	}
@@ -70,8 +70,6 @@ int init_server(int* running)
 
 		gate_service_conn(svrid,ip,port,protocol);
 	}
-
-
 
 	for(i = 0; i < 128; i++)
 	{

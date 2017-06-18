@@ -143,6 +143,7 @@ int Session::Recv(deque<Safe_Smart_Ptr<Message> > &vec)
 		}
 
 		head.toBigEndian();
+//		head.toSmallEndian();
 		if(head.remoteID < 0 || head.length < 0 || head.remoteType >= eMax || head.localType >= eMax || head.messageType > SystemMessage)
 		{
 			LOG_BASE(FILEINFO, "serialize header but header content error, so clear package content  ip[%s]", m_addr->GetIPToChar());
@@ -261,14 +262,14 @@ int Session::Recv()
 
 		const char *tmpHead = m_bufRecv;
 
-		if(dwRecvPos == 23 && strcmp(tmpHead, "<policy-file-request/>") == 0)
-		{
-			char rbuf[512]="<?xml version=\"1.0\"?><cross-domain-policy><site-control permitted-cross-domain-policies=\"all\"/><allow-access-from domain=\"*\" to-ports=\"*\"/></cross-domain-policy>\0";
-			LOG_BASE(FILEINFO, "\n ++++++++++++  recv http[%s] socket[%d] +++++++++++++++++++\n", rbuf, m_accSock);
-			Write(rbuf, strlen(rbuf) + 1);
-
-			return eNetSuccess;
-		}
+//		if(dwRecvPos == 23 && strcmp(tmpHead, "<policy-file-request/>") == 0)
+//		{
+//			char rbuf[512]="<?xml version=\"1.0\"?><cross-domain-policy><site-control permitted-cross-domain-policies=\"all\"/><allow-access-from domain=\"*\" to-ports=\"*\"/></cross-domain-policy>\0";
+//			LOG_BASE(FILEINFO, "\n ++++++++++++  recv http[%s] socket[%d] +++++++++++++++++++\n", rbuf, m_accSock);
+//			Write(rbuf, strlen(rbuf) + 1);
+//
+//			return eNetSuccess;
+//		}
 
 		if(dwRecvPos < (DWORD)HEADER_LENGTH )
 		{

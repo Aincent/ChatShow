@@ -112,7 +112,27 @@ void _parse_ini_line(struct ini_config* config,char* buf, int len)
 
 void* read_ini_file(const char* file_name)
 {
-	FILE* f = fopen(file_name, "r");
+    char strTemp[4096] = "";
+    int nLen = readlink("/proc/self/exe", strTemp, 4096);
+    if(nLen < 0)
+    {
+        return NULL;
+    }
+
+    int nPos = 0;
+    int i = 0;
+    for(; i < 4096; i++)
+    {
+    	if(strTemp[i] == '/')
+    	{
+    		nPos = i + 1;
+    	}
+    }
+
+    strTemp[nPos] ='\0';
+    strcat(strTemp,file_name);
+
+	FILE* f = fopen(strTemp, "r");
 	if (NULL == f) {
 		return NULL;
 	}

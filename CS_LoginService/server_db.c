@@ -19,7 +19,7 @@ void init_mydb(void* config,int no)
 	const char* dbpswd = config_db_pswd(config,no);
 	int port = config_db_port(config,no);
 	int type = config_db_type(config,no);
-	_g_myserver_dblist[no] = open_mydb(type,dbhost,port,dbname,dbuser,dbpswd,64,0);
+	_g_myserver_dblist[no] = open_mydb(type,dbhost,port,dbname,dbuser,dbpswd,5,0);
 }
 
 mydb* get_mydb(int no)

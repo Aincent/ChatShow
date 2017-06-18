@@ -363,7 +363,6 @@ ServerConHandler::~ServerConHandler()
 	m_timeout.Close();
 	m_client.clear();
 	m_idClient.clear();
-	m_gameSvr.clear();
 	m_gsIDSvr.clear();
 }
 
@@ -474,7 +473,6 @@ void ServerConHandler::on_channel_error(int channel_id,short int local_id,unsign
 	case eGameServer:
 		{
 			WORD gsID = CREATE_GSID(local_id, remote_id);
-			vector<int64> sceneID;
 			vector<int> copyID;
 
 			GUARD_WRITE(CRWLock, obj, &m_gsIDLock);
@@ -484,51 +482,6 @@ void ServerConHandler::on_channel_error(int channel_id,short int local_id,unsign
 				m_gsIDSvr.erase(it);
 			}
 			obj.UnLock();
-
-			GUARD_WRITE(CRWLock, objgs, &m_gsLock);
-			map<int64, WORD>::iterator itgs = m_gameSvr.begin();   //mapid   -  gsΨһid
-			for(; itgs!=m_gameSvr.end(); )
-			{
-				if(itgs->second == gsID)
-				{
-					sceneID.push_back(itgs->first);
-					m_gameSvr.erase(itgs++);
-				}
-				else
-				{
-					++itgs;
-				}
-			}
-			objgs.UnLock();
-
-			GUARD_WRITE(CRWLock, objCopy, &m_copyLock);
-			map<short int, vector<WORD> >::iterator itCopy = m_copyMapSvr.begin();   //������ͼid   -  gsΨһid
-			for(; itCopy!=m_copyMapSvr.end(); )
-			{
-				vector<WORD>::iterator itCopyGS = itCopy->second.begin();
-				for(; itCopyGS!=itCopy->second.end(); )
-				{
-					if(*itCopyGS == gsID)
-					{
-						copyID.push_back(itCopy->first);
-						itCopy->second.erase(itCopyGS);
-					}
-					else
-					{
-						++itCopyGS;
-					}
-				}
-
-				if(itCopy->second.size() == 0)
-				{
-					m_copyMapSvr.erase(itCopy++);
-				}
-				else
-				{
-					++itCopy;
-				}
-			}
-			objCopy.UnLock();
 
 			//函数有锁，外面不要加锁
 			ServerConHandler::GetInstance()->clearPlayerFromServer(gsID);
@@ -961,51 +914,12 @@ bool ServerConHandler::UpdateClientInfo(int64 charid, int channelid, string ip)
 	return m_timeout.UpdatePlayerInfo(charid, channelid, ip);
 }
 
-bool ServerConHandler::AddClientTimeOut(int64 mapid, DWORD64 charid, Safe_Smart_Ptr<CommBaseOut::Message> &message)
+bool ServerConHandler::AddClientTimeOut(DWORD64 charid, Safe_Smart_Ptr<CommBaseOut::Message> &message)
 {
-	short int serverid = -1;
-	Safe_Smart_Ptr<SvrItem> gaSvr;
-
-//	if(!GetGameServerInfo(mapid, serverid, gaSvr))
-	{
-		LOG_ERROR(FILEINFO, "Add client timeout error");
-
-		return false;
-	}
-
-	if(serverid <= 0)
-	{
-		if(GET_MAP_TYPE(mapid) >= eCopyMap)
-		{
-			LOG_DEBUG(FILEINFO,"\n*****************GATE find Instance, but instance is disappear, return to staticmap*******************");
-
-//			int inst = GET_MAP_ID(mapid);
-			int64 tMap = mapid;
-
-//			serverid = GetGameServerByMapID(inst, tMap);
-			if(serverid >= 0)
-			{
-				mapid = tMap;
-				LOG_DEBUG(FILEINFO,"\n*****************player return to staticmap, map id is %d*******************",GET_MAP_ID(mapid));
-			}
-		}
-	}
-
-	//如果找到serverid还是错的，就返回了
-	if(serverid <= 0)
-	{
-		return false;
-	}
-
-	//add
-	if(!gaSvr)
-	{
-		GetGameServerBygsID(serverid, gaSvr);
-	}
-
+	Safe_Smart_Ptr<SvrItem> gaSvr = ServerConHandler::GetLeastGameServer();
 	if(gaSvr)
 	{
-		if(!m_timeout.AddTimeout(charid, CUtil::GetNowSecond() + CONN_GATESERVER_TIMEOUT*1000, mapid, serverid, gaSvr->channelID))
+		if(!m_timeout.AddTimeout(charid, CUtil::GetNowSecond() + CONN_GATESERVER_TIMEOUT*1000, 0, CREATE_GSID(m_localID, gaSvr->remoteID), gaSvr->channelID))
 		{
 			LOG_ERROR(FILEINFO, "player is logining , so add timeout error");
 
@@ -1155,9 +1069,6 @@ bool ServerConHandler::PlayerLogin(const int64 &charid, const int64 & mapid)
 	return true;
 }
 
-/**
- * 为副本选择GameServer的机制,只是选择服人少的来进行创建
- */
 Safe_Smart_Ptr<SvrItem> ServerConHandler::GetLeastGameServer()
 {
 	int playerNum = 0;

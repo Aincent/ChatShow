@@ -166,8 +166,22 @@ static inline void pop_tcpstream_str(tcp_stream* stream,char* buf,int len)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+static inline uint32_t normal_pop_tcpstream_int32(tcp_stream* stream)
+{
+	ASSERT(stream->_off + sizeof(uint32_t) <= stream->_len);
+	uint32_t vl = *((uint32_t*)(stream->_buf+stream->_off));
+	stream->_off += sizeof(uint32_t);
+	return vl;
+}
 
-
+static inline uint16_t normal_pop_tcpstream_int16(tcp_stream* stream)
+{
+	ASSERT(stream->_off + sizeof(uint16_t) <= stream->_len);
+	uint16_t vl = *((uint16_t*)(stream->_buf+stream->_off));
+	stream->_off += sizeof(uint16_t);
+	return vl;
+}
 
 
 #endif /* TCP_STREAM_H_ */

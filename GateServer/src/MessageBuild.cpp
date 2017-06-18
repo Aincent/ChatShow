@@ -132,3 +132,18 @@ Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, Safe_Smart_Ptr
 
 	return newMessage;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, char *content, int len, int channel, int messageType, int timeOut)
+{
+	CommBaseOut::Message *newMessage = NEW CommBaseOut::Message(channel);
+
+	newMessage->SetMessageType(messageType);
+	newMessage->SetTimeout(timeOut);
+	newMessage->SetMessageID(messageID);
+	newMessage->SetLocalType(ServerConHandler::GetInstance()->GetLocalType());
+	newMessage->SetContent(content, len);
+
+	return newMessage;
+}
+

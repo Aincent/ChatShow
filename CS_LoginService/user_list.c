@@ -199,7 +199,7 @@ struct user_account* get_user_byname(char* name,void* hdata)
 }
 
 
-uint64_t pop_user_netid_byname(char* name)
+uint64_t pop_user_netid_byname(char* name,uint64_t* charid)
 {
 	uint64_t netid = 0;
 	if(-1 == _check_username(name))
@@ -212,6 +212,7 @@ uint64_t pop_user_netid_byname(char* name)
 	if(g)
 	{
 		netid = g->_netid;
+		*charid = g->_id;
 		del_str_hash(&(_g_user_list->_list[index]._users),name);
 	}
 

@@ -336,7 +336,7 @@ public:
 		return m_port;
 	}
 
-	bool AddClientTimeOut(int64 mapid, DWORD64 charid, Safe_Smart_Ptr<CommBaseOut::Message> &message);
+	bool AddClientTimeOut(DWORD64 charid, Safe_Smart_Ptr<CommBaseOut::Message> &message);
 
 	//根据角色id获取gs的频道id
 	bool GetGSChannelByCharID(const int64 &charid, int &channel);
@@ -481,10 +481,7 @@ private:
 	map<int64, Safe_Smart_Ptr<sClientItem> > m_idClient;
 	CRWLock m_clientMutex;		//玩家频道列表锁
 	CRWLock m_clientLock;	//角色id索引列表锁
-	map<int64, WORD> m_gameSvr;   //mapid   -  gsΨһid
 	CRWLock m_gsLock;
-	map<short int, vector<WORD> > m_copyMapSvr;
-	CRWLock m_copyLock;
 	map<WORD, Safe_Smart_Ptr<SvrItem> > m_gsIDSvr; // gsID   -   gameserver
 	CRWLock m_gsIDLock;
 	ConItem m_loginServer;

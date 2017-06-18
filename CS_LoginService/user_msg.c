@@ -89,7 +89,7 @@ void handle_usermsg_login(handler_msg* msg,void* user_group)
 	{
 		printf("%s \n",message);
 		user->_netid = info->_netid;
-		gate_service_call(message,strlen(message) +1);
+		gate_service_call(user->_id,message);
 	}
 	else
 	{
