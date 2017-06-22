@@ -1,0 +1,15 @@
+package CharLogin;
+
+message RetCharLoginInfo
+{
+	required int64 charid = 1;
+	required int64 mapid = 2;
+	optional bool ison = 3;
+	optional string openID = 4;  //用于 生成 创建角色 的 key
+}
+
+//玩家下线
+message CharExitGame
+{
+	required int64 charid = 1; //玩家id
+}

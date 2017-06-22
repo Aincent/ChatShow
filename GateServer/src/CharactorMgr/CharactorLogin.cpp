@@ -17,6 +17,7 @@ CharactorLogin * CharactorLogin::m_instance = 0;
 CharactorLogin::CharactorLogin()
 {
 	DEF_MSG_REQUEST_REG_FUN(eGateServer, MSG_REQ_LS2GT_WILLLOGIN);
+	DEF_MSG_REQUEST_REG_FUN(eGateServer, MSG_REQ_C2GT_HEARTBEAT);
 }
 
 CharactorLogin::~CharactorLogin()
@@ -36,6 +37,7 @@ void CharactorLogin::Handle_Request(Safe_Smart_Ptr<Message> &message)
 	DEF_SWITCH_TRY_DISPATCH_BEGIN
 
 	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_LS2GT_WILLLOGIN);
+	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_C2GT_HEARTBEAT);
 
 	DEF_SWITCH_TRY_DISPATCH_END
 }
@@ -90,3 +92,11 @@ DEF_MSG_REQUEST_DEFINE_FUN(CharactorLogin, MSG_REQ_LS2GT_WILLLOGIN)
 	Message_Facade::Send(messRet);
 }
 
+DEF_MSG_REQUEST_DEFINE_FUN(CharactorLogin, MSG_REQ_C2GT_HEARTBEAT)
+{
+	LOG_WARNING(FILEINFO, "channel[%d] heart beat [%lld]", message->GetChannelID(), CUtil::GetNowSecond());
+	ServerConHandler::GetInstance()->SynchHeartBeat(message->GetChannelID());
+
+	Safe_Smart_Ptr<CommBaseOut::Message> clientRet  = build_message(MSG_REQ_C2GT_HEARTBEAT,message,message->GetChannelID());
+	Message_Facade::Send(clientRet);
+}

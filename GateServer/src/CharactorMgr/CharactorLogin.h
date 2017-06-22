@@ -30,6 +30,7 @@ public:
 	}
 
 	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_REQ_LS2GT_WILLLOGIN);
+	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_REQ_C2GT_HEARTBEAT);
 
 	virtual void Handle_Message(Safe_Smart_Ptr<Message> &message);
 	virtual void Handle_Request(Safe_Smart_Ptr<Message> &message);

@@ -22,10 +22,10 @@ int _parse_net_tcp4msg(struct tcp_connection* c)
 		}
 		char* buf = c->_buf + TPD_MSGBEGIN;
 
-		uint32_t msglen = (*((int*)(buf)));
-		uint32_t msgid = (*((int*)(buf + 9)));
-//		uint32_t msglen = ntoh32(buf) - 26;
-//		uint32_t msgid = ntoh32(buf + 9) ;
+//		uint32_t msglen = (*((int*)(buf)));
+//		uint32_t msgid = (*((int*)(buf + 9)));
+		uint32_t msglen = ntoh32(buf);
+		uint32_t msgid = ntoh32(buf + 9) ;
 		//check message
 		msg = tcpmsg_getbyid(msgid,msglen,TPD_USERID,c->_id._i64,TPD_IP);
 		if(msg == NULL)

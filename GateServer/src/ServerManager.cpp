@@ -380,7 +380,7 @@ void ServerConHandler::on_new_channel_build(int channel_id,short int local_id,un
 		{
 			int64 timeOut = CUtil::GetNowSecond()+60000;
 			clientConnect(channel_id,timeOut);
-
+			LOG_INFO(FILEINFO,"ClientServer new channel build [channelid = %d, remoteid=%d, remotetype=%d, ip=%s]",channel_id, remote_id, remote_type, remote_address->GetIPToChar());
 			break;
 		}
 	case eGameServer:

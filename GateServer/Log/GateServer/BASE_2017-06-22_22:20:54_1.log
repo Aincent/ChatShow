@@ -1,0 +1,4 @@
+
+LOGBASE
+2017-06-22_22:23:36 FILE:../Network/EpollMain.cpp FUNC:svr LINE:324
+ 	  Message:recv message but return is socket[34] close

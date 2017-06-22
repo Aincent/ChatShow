@@ -10,7 +10,7 @@ SERVERID = 1
 
 --日志配置  base 底层日志开启    info 基本信息日志  debug 调试日志   warning提醒日志   error错误日志  fatal 致命错误日志  display是否打印到屏幕
 --fileLen日志文件最大大小(最好为1G )      filePath 日志路径       module 模块日志名
-LOGCONFIG = {{
+LOGCONFIG = {{ 
 base=1,
 info=1,
 debug=1,
@@ -36,7 +36,7 @@ CONNCONFIG =
 ACCEPTCONFIG = 
 {
 {ip="0.0.0.0",port=7000,localID=1,localType=1,keepTime=20000,security=0,maxAcc=5000,aesType=128,keepAlive=0,overCount=0},
---{ip="",port=11002,localID=1,localType=1,keepTime=200,security=0,maxAcc=5000,aesType=128,keepAlive=0,overCount=0}
+{ip="192.168.6.131",port=11001,localID=1,localType=1,keepTime=200,security=0,maxAcc=5000,aesType=128,keepAlive=0,overCount=0}
 }
 
 -- 提供外部连接的ip和端口，不需要加入监听队列（解决物理服务器ip和端口的nat映射，造成的监听ip和连接ip不一致的情况）

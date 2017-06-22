@@ -1,0 +1,7 @@
+
+LOGINFO
+2017-06-22_23:38:16 FILE:../src/ServerManager.cpp FUNC:on_new_channel_build LINE:383
+ 	  Message:ClientServer new channel build [channelid = 36, remoteid=1, remotetype=0, ip=127.0.0.1]
+LOGINFO
+2017-06-22_23:38:47 FILE:../src/ServerManager.cpp FUNC:on_channel_error LINE:467
+ 	  Message:client new channel build error [channelid = 36, remoteid=1, remotetype=0, ip=127.0.0.1 , errorno=30]
