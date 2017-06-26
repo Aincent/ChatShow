@@ -1,0 +1,9 @@
+package ServerReturn;
+
+message ServerFourInt
+{
+	required int64 retf = 1;
+	optional int64 rets = 2 [default=0];
+	optional int64 rett = 3 [default=0];
+	optional int64 retfo = 4 [default=0];
+}

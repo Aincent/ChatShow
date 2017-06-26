@@ -1,0 +1,49 @@
+package ServerReturn;
+
+message ServerRetIntChar
+{
+	required int64 retf = 1;
+	required string rets = 2;
+}
+
+message ServerDoubleIntChar
+{
+	required int64 retf = 1;
+	required int64 rets = 2;
+	required string rett = 3;
+}
+
+message ServerDoubleIntTwoChar
+{
+	required int64 retf = 1;
+	required int64 rets = 2;
+	required string rett = 3;
+	required string reft = 4;
+}
+
+message ServerThreeIntChar
+{
+	required int64 retf = 1;
+	required int64 rets = 2;
+	required int64 rett = 3;
+	required string retfo = 4;
+}
+
+message ServerFourIntChar
+{
+	required int64 retf = 1;
+	required int64 rets = 2;
+	required int64 rett = 3;
+	required int64 retfo = 4;
+	required string retfi = 5;
+}
+
+message ServerThreeIntTwoChar
+{
+	required int64 code = 1;
+	optional int64 rets = 2;
+	optional int64 rett = 3;
+	optional string retf = 4;
+	optional string retfi = 5;
+}
+

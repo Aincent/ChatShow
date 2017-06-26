@@ -1,0 +1,25 @@
+package ServerReturn;
+
+message ServerDoubleInt
+{
+	required int64 retf = 1;
+	optional int64 rets = 2;
+}
+
+message ServerDoubleRetInt
+{
+	required int32 retf = 1;
+	optional int64 rets = 2;
+}
+
+message ServerDoubleUint32
+{
+	required int32 retf = 1;
+	optional int32 rets = 2;
+}
+
+message ServerDoubleUint32Array
+{
+	repeated ServerDoubleUint32 ret = 1;
+}
+

@@ -9,8 +9,8 @@
 #define CHARACTORMGR_CHARACTORLOGIN_H_
 
 #include "Network/MessageHandler.h"
-#include "../MsgDefineMacro.h"
-#include "../ServerMsgDefine.h"
+#include "MsgDefineMacro.h"
+#include "ServerMsgDefine.h"
 
 using namespace CommBaseOut;
 
@@ -31,6 +31,9 @@ public:
 
 	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_REQ_LS2GT_WILLLOGIN);
 	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_REQ_C2GT_HEARTBEAT);
+	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_REQ_C2GT_PLAYERINFO);
+
+	DEF_MSG_ACK_DECLARE_FUN_H(MSG_REQ_GT2GM_PLAYERINFO);
 
 	virtual void Handle_Message(Safe_Smart_Ptr<Message> &message);
 	virtual void Handle_Request(Safe_Smart_Ptr<Message> &message);

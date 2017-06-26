@@ -1,0 +1,27 @@
+package ServerReturn;
+
+message ServerRetInt
+{
+	required int64 ret = 1;     
+}
+
+message ServerRetIntArray
+{
+	repeated int64 ret = 1;
+}
+
+message ServerRetInt32Array
+{
+	repeated int32 ret = 1;
+}
+
+message ServerDoubleIntArray
+{
+	required int64 retf = 1;
+	repeated int64 rets = 2;
+}
+
+message ServerResultInt
+{
+	required int32 ret = 1;     
+}

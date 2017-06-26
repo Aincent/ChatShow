@@ -1,0 +1,10 @@
+package ServerReturn;
+
+message ServerFiveInt
+{
+	required int64 retf = 1;
+	required int64 rets = 2;
+	optional int64 oldrets = 3;
+	optional int64 oldXPos = 4;
+	optional int64 oldYPos = 5;
+}

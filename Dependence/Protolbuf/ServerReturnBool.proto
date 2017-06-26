@@ -1,0 +1,12 @@
+package ServerReturn;
+
+message ServerRetBool
+{
+	required bool ret = 1;
+}
+
+message ServerRetBoolInt
+{
+	required bool retf = 1;
+	required int32 rets = 2;
+}

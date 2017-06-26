@@ -36,7 +36,7 @@ CONNCONFIG =
 ACCEPTCONFIG = 
 {
 {ip="0.0.0.0",port=7000,localID=1,localType=1,keepTime=20000,security=0,maxAcc=5000,aesType=128,keepAlive=0,overCount=0},
-{ip="192.168.6.131",port=11001,localID=1,localType=1,keepTime=200,security=0,maxAcc=5000,aesType=128,keepAlive=0,overCount=0}
+{ip="192.168.6.132",port=11001,localID=1,localType=1,keepTime=200,security=0,maxAcc=5000,aesType=128,keepAlive=0,overCount=0}
 }
 
 -- 提供外部连接的ip和端口，不需要加入监听队列（解决物理服务器ip和端口的nat映射，造成的监听ip和连接ip不一致的情况）

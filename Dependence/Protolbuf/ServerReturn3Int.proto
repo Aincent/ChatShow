@@ -1,0 +1,8 @@
+package ServerReturn;
+
+message ServerThreeInt
+{
+	required int64 retf = 1;
+	required int64 rets = 2;
+	required int64 rett = 3;
+}

@@ -61,7 +61,7 @@ static inline int tcp_connect(int* s,uint32_t ip,int port)
 		bzero(&addr,sizeof(addr));
 		addr.sin_family = AF_INET;
 		addr.sin_port=htons(port);
-		addr.sin_addr.s_addr = htonl(ip);
+		addr.sin_addr.s_addr = ip;
 
 //	     if( inet_pton(AF_INET,"0.0.0.0",&addr.sin_addr) <=0 ) {
 //	             printf("inet_pton error for %s\n","127.0.0.1");

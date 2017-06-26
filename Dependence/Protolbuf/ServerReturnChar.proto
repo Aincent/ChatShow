@@ -1,0 +1,6 @@
+package ServerReturn;
+
+message ServerRetChar
+{
+	required string ret = 1;
+}
