@@ -265,14 +265,18 @@ public:
 
 	void RegisterMsg()
 	{
-//		DEF_MSG_REQUEST_REG_FUN(eGateServer, MSG_SIM_GT2GM_PUSHSERVERID);
+		DEF_MSG_REQUEST_REG_FUN(eGateServer, MSG_REQ_GT2GM_PUSHSERVERID);
+		DEF_MSG_SIMPLE_REG_FUN(eGateServer, MSG_SIM_GM2GT_PLAYER_EXIT);
+		DEF_MSG_ACK_REG_FUN(eGateServer, MSG_REQ_GT2GM_PLAYEREXIT);
 	}
 
-	bool PlayerLogin(const int64 &charid, const int64 & mapid);
+	bool PlayerLogin(const int64 &charid);
 
 	void SynchHeartBeat(const int &channel);
 
-//	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_SIM_GT2GM_PUSHSERVERID);
+	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_REQ_GT2GM_PUSHSERVERID);
+	DEF_MSG_SIMPLE_DECLARE_FUN_H(MSG_SIM_GM2GT_PLAYER_EXIT);
+	DEF_MSG_ACK_DECLARE_FUN_H(MSG_REQ_GT2GM_PLAYEREXIT);
 
 	virtual void Handle_Request(Safe_Smart_Ptr<Message> &message);
 	virtual void Handle_Message(Safe_Smart_Ptr<Message> &message);

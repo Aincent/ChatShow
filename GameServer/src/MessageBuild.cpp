@@ -36,36 +36,6 @@ Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, google::protob
 	return newMessage;
 }
 
-Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, google::protobuf::Message *content, ConItem *handler, int messageType, int timeOut)
-{
-	string tempStr;
-	CommBaseOut::Message *newMessage = NEW CommBaseOut::Message(handler->remoteID, handler->remoteType, handler->channelID);
-	content->SerializePartialToString(&tempStr);
-
-	newMessage->SetMessageType(messageType);
-	newMessage->SetTimeout(timeOut);
-	newMessage->SetMessageID(messageID);
-	newMessage->SetLocalType(ServerConHandler::GetInstance()->GetLocalType());
-	newMessage->SetContent(tempStr.c_str(), tempStr.size());
-
-	return newMessage;
-}
-
-Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, google::protobuf::Message *content, sClientItem *handler, int messageType, int timeOut)
-{
-	string tempStr;
-	CommBaseOut::Message *newMessage = NEW CommBaseOut::Message(0, 0, handler->channelID);
-	content->SerializePartialToString(&tempStr);
-
-	newMessage->SetMessageType(messageType);
-	newMessage->SetTimeout(timeOut);
-	newMessage->SetMessageID(messageID);
-	newMessage->SetLocalType(ServerConHandler::GetInstance()->GetLocalType());
-	newMessage->SetContent(tempStr.c_str(), tempStr.size());
-
-	return newMessage;
-}
-
 Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, char *content, int len, SvrItem *handler, int messageType, int timeOut)
 {
 	CommBaseOut::Message *newMessage = NEW CommBaseOut::Message(handler->remoteID, handler->remoteType, handler->channelID);
@@ -75,19 +45,6 @@ Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, char *content,
 	newMessage->SetMessageID(messageID);
 	newMessage->SetLocalType(ServerConHandler::GetInstance()->GetLocalType());
 	newMessage->SetContent(content, len);
-
-	return newMessage;
-}
-
-Safe_Smart_Ptr<CommBaseOut::Message> build_message(int messageID, string &content, sClientItem *handler, int messageType, int timeOut)
-{
-	CommBaseOut::Message *newMessage = NEW CommBaseOut::Message(0, 0, handler->channelID);
-
-	newMessage->SetMessageType(messageType);
-	newMessage->SetTimeout(timeOut);
-	newMessage->SetMessageID(messageID);
-	newMessage->SetLocalType(ServerConHandler::GetInstance()->GetLocalType());
-	newMessage->SetContent(content.c_str(), content.size());
 
 	return newMessage;
 }

@@ -275,7 +275,7 @@ public:
 			m_dbConfig.host = host;
 			m_dbConfig.db = db;
 			string tempStr = passwd;
-			m_dbConfig.passwd = Password::getStr(tempStr);
+			m_dbConfig.passwd = tempStr; // Password::getStr(tempStr);
 			m_dbConfig.user = user;
 
 			m_pLua.CloseTable();

@@ -13,6 +13,7 @@
 #include "MsgCommonClass.h"
 #include "Log/Logger.h"
 #include "SvrConfig.h"
+#include "MessageStruct/ServerReturnInt.pb.h"
 
 ServerConHandler *ServerConHandler::m_instance = 0;
 
@@ -968,60 +969,60 @@ void ServerConHandler::removeConnect(int channel)
 }
 
 
-bool ServerConHandler::PlayerLogin(const int64 &charid, const int64 & mapid)
+bool ServerConHandler::PlayerLogin(const int64 &charid)
 {
-//	Safe_Smart_Ptr<ConnTimeout::ConnClient> client;
+	Safe_Smart_Ptr<ConnTimeout::ConnClient> client;
 //	int64 oldMap = -1;
-//	int gsid = -1;
+	int gsid = -1;
 //	bool isSame = false;
-//
-//	LOG_WARNING(FILEINFO,"ServerConHandler::PlayerLogin(const int64 &charid, Safe_Smart_Ptr<ConnClient> &client).................................. %lld", GET_PLAYER_CHARID(charid));
-//	if(!m_timeout.PlayerLogin(charid, client))
-//	{
-//		return false;
-//	}
-//
+
+	LOG_WARNING(FILEINFO,"ServerConHandler::PlayerLogin(const int64 &charid, Safe_Smart_Ptr<ConnClient> &client).................................. %lld", GET_PLAYER_CHARID(charid));
+	if(!m_timeout.PlayerLogin(charid, client))
+	{
+		return false;
+	}
+
 //	oldMap = client->mapID;
 //	client->mapID = mapid;
-//
-//	GUARD_WRITE(CRWLock, obj, &m_clientLock);
-//	map<int64, Safe_Smart_Ptr<sClientItem> >::iterator itItem =  m_idClient.find(charid);
-//	if(itItem != m_idClient.end() && itItem->second.Get()!=NULL)
-//	{
-//		itItem->second->group = client->group;
-//		itItem->second->gsChannelID = client->gsChannelID;
-//		gsid = itItem->second->gsID;
-//		itItem->second->gsID = client->gsID;
+
+	GUARD_WRITE(CRWLock, obj, &m_clientLock);
+	map<int64, Safe_Smart_Ptr<sClientItem> >::iterator itItem =  m_idClient.find(charid);
+	if(itItem != m_idClient.end() && itItem->second.Get()!=NULL)
+	{
+		itItem->second->group = client->group;
+		itItem->second->gsChannelID = client->gsChannelID;
+		gsid = itItem->second->gsID;
+		itItem->second->gsID = client->gsID;
 //		itItem->second->mapID = mapid;
 //		if(gsid == client->gsID)
 //			isSame = true;
-//
-//		obj.UnLock();
-//	}
-//	else
-//	{
-//		Safe_Smart_Ptr<sClientItem> item = new sClientItem();
-//
-//		item->channelID = client->channeid;
-//		item->group = client->group;
-//		item->gsChannelID = client->gsChannelID;
-//		item->charID = client->charid;
-//		item->gsID = client->gsID;
-//		item->ip = client->ip;
+
+		obj.UnLock();
+	}
+	else
+	{
+		Safe_Smart_Ptr<sClientItem> item = new sClientItem();
+
+		item->channelID = client->channeid;
+		item->group = client->group;
+		item->gsChannelID = client->gsChannelID;
+		item->charID = client->charid;
+		item->gsID = client->gsID;
+		item->ip = client->ip;
 //		item->mapID = mapid;
-//
-//		m_idClient[item->charID] = item;
-//		obj.UnLock();
-//
-//		GUARD_WRITE(CRWLock, objChannel, &m_clientMutex);
-//		if(item->channelID >=0 && item->channelID<(int)m_client.size())
-//		{
-//			m_client[item->channelID] = item;
-//		}
-//	}
-//
+
+		m_idClient[item->charID] = item;
+		obj.UnLock();
+
+		GUARD_WRITE(CRWLock, objChannel, &m_clientMutex);
+		if(item->channelID >=0 && item->channelID<(int)m_client.size())
+		{
+			m_client[item->channelID] = item;
+		}
+	}
+
 //	bool isHave = IsHaveSceneID(mapid);
-//
+
 //	GUARD_WRITE(CRWLock, objgs, &m_gsIDLock);
 //	map<WORD, Safe_Smart_Ptr<SvrItem> >::iterator it = m_gsIDSvr.find(client->gsID);
 //	if(it != m_gsIDSvr.end() && it->second.Get()!=NULL)
@@ -1065,7 +1066,7 @@ bool ServerConHandler::PlayerLogin(const int64 &charid, const int64 & mapid)
 //			}
 //		}
 //	}
-//
+
 	return true;
 }
 
@@ -1151,9 +1152,7 @@ void ServerConHandler::Handle_Message(Safe_Smart_Ptr<Message> &message)
 {
 	DEF_SWITCH_TRY_DISPATCH_BEGIN
 
-//	DEF_MSG_SIMPLE_DISPATCH_FUN(MSG_SIM_GM2GT_PUSHALLMAP);
-//	DEF_MSG_SIMPLE_DISPATCH_FUN(MSG_SIM_GM2GT_PLAYER_EXIT);
-//	DEF_MSG_SIMPLE_DISPATCH_FUN(MSG_REQ_WS2GT_CREATESCENE);
+	DEF_MSG_SIMPLE_DISPATCH_FUN(MSG_SIM_GM2GT_PLAYER_EXIT);
 
 	DEF_SWITCH_TRY_DISPATCH_END
 }
@@ -1162,7 +1161,7 @@ void ServerConHandler::Handle_Request(Safe_Smart_Ptr<Message> &message)
 {
 	DEF_SWITCH_TRY_DISPATCH_BEGIN
 
-//	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_SIM_GT2GM_PUSHSERVERID);
+	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_GT2GM_PUSHSERVERID);
 
 	DEF_SWITCH_TRY_DISPATCH_END
 }
@@ -1171,19 +1170,41 @@ void ServerConHandler::Handle_Ack(Safe_Smart_Ptr<Message> &message)
 {
 	DEF_SWITCH_TRY_DISPATCH_BEGIN
 
-//	DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GT2GM_PLAYEREXIT);
+	DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GT2GM_PLAYEREXIT);
 
 	DEF_SWITCH_TRY_DISPATCH_END
 }
 
-//DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_GT2GM_PLAYEREXIT)
-//{
-//	if(message->GetErrno() == eReqTimeOut)
-//	{
-//		LOG_WARNING(FILEINFO, "gateserver request gameserver exit player and ack timeout");
-//	}
-//
-//	LOG_WARNING(FILEINFO,"ServerConHandler::PlayerExitEx(const int64 &charid, Safe_Smart_Ptr<Message> message).................................. %lld", GET_PLAYER_CHARID(static_cast<FirstAct *>(act.Get())->mesDataf));
-//	PlayerExitEx(static_cast<FirstAct *>(act.Get())->mesDataf, static_cast<FirstAct *>(act.Get())->mesReq);
-//}
 
+DEF_MSG_REQUEST_DEFINE_FUN(ServerConHandler, MSG_REQ_GT2GM_PUSHSERVERID)
+{
+	ServerReturn::ServerRetInt meContent;
+	meContent.set_ret(m_serverID);
+
+	Safe_Smart_Ptr<CommBaseOut::Message> clientRet  = build_message(MSG_REQ_GT2GM_PUSHSERVERID, message, &meContent);
+	Message_Facade::Send(clientRet);
+}
+
+DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_GT2GM_PLAYEREXIT)
+{
+	if(message->GetErrno() == eReqTimeOut)
+	{
+		LOG_WARNING(FILEINFO, "gateserver request gameserver exit player and ack timeout");
+	}
+
+	LOG_WARNING(FILEINFO,"ServerConHandler::PlayerExitEx(const int64 &charid, Safe_Smart_Ptr<Message> message).................................. %lld", GET_PLAYER_CHARID(static_cast<FirstAct *>(act.Get())->mesDataf));
+	PlayerExitEx(static_cast<FirstAct *>(act.Get())->mesDataf, static_cast<FirstAct *>(act.Get())->mesReq);
+}
+
+
+DEF_MSG_SIMPLE_DEFINE_FUN(ServerConHandler, MSG_SIM_GM2GT_PLAYER_EXIT)
+{
+	ServerReturn::ServerRetInt ret;
+	int len = 0;
+	char *content = message->GetBuffer(len);
+	ret.ParseFromArray(content, len);
+
+	LOG_DEBUG(FILEINFO, "gameserver request gt player[%lld] exit", GET_PLAYER_CHARID(ret.ret()));
+	LOG_WARNING(FILEINFO,"ServerConHandler::PlayerExitEx(const int64 &charid, bool flag, Safe_Smart_Ptr<Message> message).................................. %lld", GET_PLAYER_CHARID(ret.ret()));
+	PlayerExit((int64)ret.ret(), true);
+}

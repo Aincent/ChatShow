@@ -1,4 +1,0 @@
-
-LOGWARNING
-2017-06-22_22:26:16 FILE:../src/ServerManager.cpp FUNC:checkConnect LINE:260
- 	  Message:close error connected channel[36]

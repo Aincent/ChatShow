@@ -61,15 +61,17 @@ void ServerConHandler::on_new_channel_build(int channel_id,short int local_id,un
 			m_allSvr[channel_id] = item;
 			obj.UnLock();
 
+			ServerReturn::ServerRetInt meContent;
+			SendMessageToServer(Request, remote_id, remote_type, channel_id, MSG_REQ_GT2GM_PUSHSERVERID, &meContent);
 			break;
 		}
 	case eDBServer:
 		{
-//			GUARD(CSimLock, obj, &m_allLock);
+			GUARD(CSimLock, obj, &m_allLock);
 			map<int,Smart_Ptr<SvrItem> >::iterator it = m_allSvr.find(channel_id);
 			if(it != m_allSvr.end())
 			{
-//				obj.UnLock();
+				obj.UnLock();
 				LOG_WARNING(FILEINFO,"dbServer new channel build again closed [channelid = %d, remoteid=%d, remotetype=%d, ip=%s]",channel_id, remote_id, remote_type, remote_address->GetIPToChar());
 
 				Message_Facade::CloseChannel(channel_id);
@@ -86,6 +88,10 @@ void ServerConHandler::on_new_channel_build(int channel_id,short int local_id,un
 			item->remoteID = remote_id;
 			item->remoteType = remote_type;
 			m_allSvr[channel_id] = item;
+			obj.UnLock();
+
+			ServerReturn::ServerRetInt meContent;
+			SendMessageToServer(Request, remote_id, remote_type, channel_id, MSG_REQ_DB2GM_PUSHSERVERID, &meContent);
 
 			break;
 		}
@@ -351,14 +357,14 @@ void ServerConHandler::BraodcastMessageToWorld(unsigned int msgType, unsigned in
 void ServerConHandler::Handle_Ack(Safe_Smart_Ptr<Message> &message)
 {
 	DEF_SWITCH_TRY_DISPATCH_BEGIN
-		DEF_MSG_ACK_DISPATCH_FUN(MSG_SIM_GT2GM_PUSHSERVERID);
-		DEF_MSG_ACK_DISPATCH_FUN(MSG_SIM_DB2GM_PUSHSERVERID);
-		DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GM2WS_PUSHSERVERID);
-		DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GM2MS_PUSHSERVERID);
+		DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GT2GM_PUSHSERVERID);
+		DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_DB2GM_PUSHSERVERID);
+//		DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GM2WS_PUSHSERVERID);
+//		DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GM2MS_PUSHSERVERID);
 	DEF_SWITCH_TRY_DISPATCH_END
 }
 
-DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_SIM_GT2GM_PUSHSERVERID)
+DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_GT2GM_PUSHSERVERID)
 {
 	if(message->GetErrno() == eReqTimeOut)
 	{
@@ -376,21 +382,21 @@ DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_SIM_GT2GM_PUSHSERVERID)
 
 	sim.ParseFromArray(content, len);
 
-//	GUARD(CSimLock, obj, &m_allLock);
+	GUARD(CSimLock, obj, &m_allLock);
 	map<int,Smart_Ptr<SvrItem> >::iterator it = m_allSvr.find(message->GetChannelID());
 	if(it != m_allSvr.end())
 	{
 		it->second->serverID = sim.ret();
 		item = it->second;
 	}
-//	obj.UnLock();
+	obj.UnLock();
 
-//	GUARD(CSimLock, objgt, &m_gateLock);
+	GUARD(CSimLock, objgt, &m_gateLock);
 	m_gateSvr[sim.ret()] = item;
-//	objgt.UnLock();
+	objgt.UnLock();
 }
 
-DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_SIM_DB2GM_PUSHSERVERID)
+DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_DB2GM_PUSHSERVERID)
 {
 	if(message->GetErrno() == eReqTimeOut)
 	{
@@ -408,81 +414,81 @@ DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_SIM_DB2GM_PUSHSERVERID)
 
 	sim.ParseFromArray(content, len);
 
-//	GUARD(CSimLock, obj, &m_allLock);
+	GUARD(CSimLock, obj, &m_allLock);
 	map<int,Smart_Ptr<SvrItem> >::iterator it = m_allSvr.find(message->GetChannelID());
 	if(it != m_allSvr.end())
 	{
 		it->second->serverID = sim.ret();
 		item = it->second;
 	}
-//	obj.UnLock();
+	obj.UnLock();
 
-//	GUARD(CSimLock, objdb, &m_dbLock);
+	GUARD(CSimLock, objdb, &m_dbLock);
 	m_dbSvr[sim.ret()] = item;
-//	objdb.UnLock();
+	objdb.UnLock();
 }
 
-DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_GM2WS_PUSHSERVERID)
-{
-	if(message->GetErrno() == eReqTimeOut)
-	{
-		LOG_WARNING(FILEINFO, "gameserver request worldserver push server id and ack timeout");
-
-		return;
-	}
-
-	LOG_DEBUG(FILEINFO, "worldserver push server id");
-
-	ServerReturn::ServerRetInt sim;
-	int len = 0;
-	char *content = message->GetBuffer(len);
-	Smart_Ptr<SvrItem> item;
-
-	sim.ParseFromArray(content, len);
-
-	map<int,Smart_Ptr<SvrItem> >::iterator it = m_allSvr.find(message->GetChannelID());
-	if(it != m_allSvr.end())
-	{
-		it->second->serverID = sim.ret();
-		item = it->second;
-	}
-
-	m_worldSvr[sim.ret()] = item;
-
-	map<int,Smart_Ptr<SvrItem> >::iterator itGate = m_gateSvr.find(sim.ret());
-	if(itGate != m_gateSvr.end())
-	{
-		CSceneMgr::GetInstance()->SendAllMap(itGate->second->remoteID, itGate->second->remoteType, itGate->second->channelID, m_localID, m_localType);
-	}
-}
-
-DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_GM2MS_PUSHSERVERID)
-{
-	if(message->GetErrno() == eReqTimeOut)
-	{
-		LOG_WARNING(FILEINFO, "gameserver request managerServer push server id and ack timeout");
-
-		return;
-	}
-
-	LOG_DEBUG(FILEINFO, "managerServer push server id");
-
-	ServerReturn::ServerRetInt sim;
-	int len = 0;
-	char *content = message->GetBuffer(len);
-	Smart_Ptr<SvrItem> item;
-
-	sim.ParseFromArray(content, len);
-
-	map<int,Smart_Ptr<SvrItem> >::iterator it = m_allSvr.find(message->GetChannelID());
-	if(it != m_allSvr.end())
-	{
-		it->second->serverID = sim.ret();
-		item = it->second;
-	}
-
-	m_managerSvr[sim.ret()] = item;
-}
+//DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_GM2WS_PUSHSERVERID)
+//{
+//	if(message->GetErrno() == eReqTimeOut)
+//	{
+//		LOG_WARNING(FILEINFO, "gameserver request worldserver push server id and ack timeout");
+//
+//		return;
+//	}
+//
+//	LOG_DEBUG(FILEINFO, "worldserver push server id");
+//
+//	ServerReturn::ServerRetInt sim;
+//	int len = 0;
+//	char *content = message->GetBuffer(len);
+//	Smart_Ptr<SvrItem> item;
+//
+//	sim.ParseFromArray(content, len);
+//
+//	map<int,Smart_Ptr<SvrItem> >::iterator it = m_allSvr.find(message->GetChannelID());
+//	if(it != m_allSvr.end())
+//	{
+//		it->second->serverID = sim.ret();
+//		item = it->second;
+//	}
+//
+//	m_worldSvr[sim.ret()] = item;
+//
+//	map<int,Smart_Ptr<SvrItem> >::iterator itGate = m_gateSvr.find(sim.ret());
+//	if(itGate != m_gateSvr.end())
+//	{
+//		CSceneMgr::GetInstance()->SendAllMap(itGate->second->remoteID, itGate->second->remoteType, itGate->second->channelID, m_localID, m_localType);
+//	}
+//}
+//
+//DEF_MSG_ACK_DEFINE_FUN(ServerConHandler, MSG_REQ_GM2MS_PUSHSERVERID)
+//{
+//	if(message->GetErrno() == eReqTimeOut)
+//	{
+//		LOG_WARNING(FILEINFO, "gameserver request managerServer push server id and ack timeout");
+//
+//		return;
+//	}
+//
+//	LOG_DEBUG(FILEINFO, "managerServer push server id");
+//
+//	ServerReturn::ServerRetInt sim;
+//	int len = 0;
+//	char *content = message->GetBuffer(len);
+//	Smart_Ptr<SvrItem> item;
+//
+//	sim.ParseFromArray(content, len);
+//
+//	map<int,Smart_Ptr<SvrItem> >::iterator it = m_allSvr.find(message->GetChannelID());
+//	if(it != m_allSvr.end())
+//	{
+//		it->second->serverID = sim.ret();
+//		item = it->second;
+//	}
+//
+//	m_managerSvr[sim.ret()] = item;
+//}
 
 void ServerConHandler::GetWorldServerBySvrID(short int id, Smart_Ptr<SvrItem> &worldSvr)
 {
