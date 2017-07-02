@@ -53,7 +53,7 @@ struct user_account* _load_user_cache(char* name,void* g)
 	if(NULL == user)
 	{
 		char sql[256];
-		int n = snprintf(sql,sizeof(sql),"select psd,state,id from %s where name='%s'",_g_user_server._table,name);
+		int n = snprintf(sql,sizeof(sql),"select psd,state,CharID from %s where CharName='%s'",_g_user_server._table,name);
 
 		mydb* db = get_mydb(0);
 		mydb_recordset* rset = get_recordset(db,sql,n);
@@ -95,7 +95,7 @@ void handle_usermsg_login(handler_msg* msg,void* user_group)
 	{
 		char mess[33] = {0};
 		strncpy(mess,message,33);
-		info->_len = sprintf(info->_buf,"{\"%s\"}",mess);
+		info->_len = sprintf(info->_buf,"\"msg\":%s,\"charid\":%d}",mess,-1);
 		msg->_msgid = 1025;
 
 		tcp_sendmsg(info->_netid,msg);
@@ -112,7 +112,7 @@ void handle_usermsg_register(handler_msg* msg,void* user_group)
 	tcp_stream* info = (tcp_stream*)msg->_data;
 
 	char sql[256];
-	int n = snprintf(sql,sizeof(sql),"select psd,state,id from %s where name='%s'",_g_user_server._table,name);
+	int n = snprintf(sql,sizeof(sql),"select psd,state,CharID from %s where CharName='%s'",_g_user_server._table,name);
 
 	mydb* db = get_mydb(0);
 	mydb_recordset* rset = get_recordset(db,sql,n);
@@ -128,7 +128,7 @@ void handle_usermsg_register(handler_msg* msg,void* user_group)
 	if(result == 1)
 	{
 		MYMD5_ENCRYPT2((uint8_t*)name,strlen(name),(uint8_t*)password,strlen(password),pswd);
-		int n = snprintf(sql,sizeof(sql),"insert into %s (name,psd,state) values (\'%s\',\'%s\',0)",
+		int n = snprintf(sql,sizeof(sql),"insert into %s (CharName,psd,state) values (\'%s\',\'%s\',0)",
 				_g_user_server._table,name,pswd);
 
 		mydb* db = get_mydb(0);
@@ -156,7 +156,7 @@ void handle_usermsg_password(handler_msg* msg,void* user_group)
 
 	char sql[256];
 	MYMD5_ENCRYPT2((uint8_t*)name,strlen(name),(uint8_t*)newpassword,strlen(newpassword),pswd);
-	int n = snprintf(sql,sizeof(sql),"update %s set psd=\'%s\' where name=\'%s\';",_g_user_server._table,pswd,name);
+	int n = snprintf(sql,sizeof(sql),"update %s set psd=\'%s\' where CharName=\'%s\';",_g_user_server._table,pswd,name);
 	mydb* db = get_mydb(0);
 	if(0 == do_sql(db,sql,n))
 	{

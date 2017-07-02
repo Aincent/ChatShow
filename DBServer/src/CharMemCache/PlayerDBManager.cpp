@@ -29,11 +29,10 @@ int CStructTemplate::SavePlayerBaseInfo(PlayerInfo::BaseInfo *info)
 	try
 	{
 		CMysqlInterface con;
-		int64 teamId = 0;
 
-		int64 nowTime = CUtil::GetNowSecond();
-
-		con.Execute("update RoleInfo set CharName='%s',");
+		con.Execute("update RoleInfo set CharName='%s',nickname='%s',head='%s',address='%s',sex=%d,zone='%s',signature='%s' where CharID = %lld ",
+				info->charname().c_str(),info->nickname().c_str(),info->head().c_str(),info->address().c_str(),info->sex(),info->zone().c_str(),
+				info->signature().c_str(),GET_PLAYER_CHARID(info->charid()));
 
 
 		con.GetNextRow();

@@ -142,7 +142,12 @@ void CCharLogin::getRoleInfo(int64 playerID,Smart_Ptr<PlayerDBMgr> player,CMysql
 
 		baseInfo->set_charid(mysqlInterface.GetInt64Name("CharID"));
 		baseInfo->set_charname(mysqlInterface.GetStringName("CharName"));
-
+		baseInfo->set_nickname(mysqlInterface.GetStringName("nickname"));
+		baseInfo->set_head(mysqlInterface.GetStringName("head"));
+		baseInfo->set_address(mysqlInterface.GetStringName("address"));
+		baseInfo->set_sex(mysqlInterface.GetIntName("sex"));
+		baseInfo->set_zone(mysqlInterface.GetStringName("zone"));
+		baseInfo->set_signature(mysqlInterface.GetStringName("signature"));
 
 		player->AddStruct(eBaseInfo, baseInfo);
 	}
@@ -160,7 +165,7 @@ void CCharLogin::getRoleInfo(int64 playerID,Smart_Ptr<PlayerDBMgr> player,CMysql
 
 DEF_MSG_SIMPLE_DEFINE_FUN(CCharLogin, MSG_SIM_GT2GM_SAVE_PLAYERINFO)
 {
-	//LOG_DEBUG(FILEINFO, "[messageid = %d] save player info", MSG_SIM_GT2GM_SAVE_PLAYERINFO);
+	LOG_DEBUG(FILEINFO, "[messageid = %d] save player info", MSG_SIM_GT2GM_SAVE_PLAYERINFO);
 
 	PlayerInfo::SaveTypeInfo meContent;
 	char *str;
