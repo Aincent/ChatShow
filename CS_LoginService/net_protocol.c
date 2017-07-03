@@ -8,11 +8,9 @@
 #include "net_protocol.h"
 #include "antlib.h"
 #include "user_msg.h"
+#include "user_list.h"
 #include "gate_server.h"
 #include "protocollib/tcp_protocol.h"
-
-//#define TCPMSG_REGITST_STRING(path,name,msgid,fun) struct pm_tcpmsg_field message[1] = {{"message",0,3,32}};\
-//	tcpmsg_regist_string(path,name,msgid,message,1,fun);
 
 //check message then add to handler
 void do_user_netmsg(handler_msg* msg,uint64_t userid,uint64_t netid)

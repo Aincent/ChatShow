@@ -146,7 +146,7 @@ void gate_service_domsg(handler_msg* msg,void* g,uint32_t hid)
 			printf("charid =  %ld \n", charid);
 			if(netid > 0)
 			{
-				info->_len = sprintf(info->_buf,"{\"msg\":%s,\"charid\":%ld,\"ip\":%s,\"port\":%d,\"localid\":%d}",name,((1 << 16) | charid),ip,port,localID);
+				info->_len = sprintf(info->_buf,"{\"msg\":%s,\"charid\":%ld,\"ip\":%s,\"port\":%d,\"localid\":%d}",name,(((uint64_t)1 << 48) | charid),ip,port,localID);
 				msg->_msgid = 0;
 				tcp_sendmsg(netid,msg);
 			}
