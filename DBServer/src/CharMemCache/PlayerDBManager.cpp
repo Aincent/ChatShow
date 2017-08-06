@@ -30,9 +30,11 @@ int CStructTemplate::SavePlayerBaseInfo(PlayerInfo::BaseInfo *info)
 	{
 		CMysqlInterface con;
 
-		con.Execute("update RoleInfo set CharName='%s',nickname='%s',head='%s',address='%s',sex=%d,zone='%s',signature='%s' where CharID = %lld ",
-				info->charname().c_str(),info->nickname().c_str(),info->head().c_str(),info->address().c_str(),info->sex(),info->zone().c_str(),
-				info->signature().c_str(),GET_PLAYER_CHARID(info->charid()));
+		con.Execute("update RoleInfo set CharName='%s',wchatname='%s',head='%s',sex=%d,country = %d,province = %d,city = %d,signature='%s',"
+				"money = %d,""turnmoney = %d,qrcode = '%s',phone = '%s',year = %d,month = %d,day = %d where CharID = %lld ",
+				info->charname().c_str(),info->wchatname().c_str(),info->head().c_str(),info->sex(),info->country(),info->province(),info->city(),
+				info->signature().c_str(),info->money(),info->turnmoney(),info->qrcode().c_str(),info->phone().c_str(),info->year(),info->month(),
+				info->day(),GET_PLAYER_CHARID(info->charid()));
 
 
 		con.GetNextRow();

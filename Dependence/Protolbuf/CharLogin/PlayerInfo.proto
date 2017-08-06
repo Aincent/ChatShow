@@ -1,0 +1,54 @@
+package PlayerInfo;
+
+message PlayerInfo
+{
+	required BaseInfo bsinfo = 1;
+	optional FriendInfoList friendlist = 2;    //玩家的好友数据
+}
+
+message BaseInfo
+{
+	required int64 charid = 1; 		// 用户id
+	required string charname = 2;	// 用户名字
+	required string wchatname = 3;  // 文人号
+	required string head = 4;		// 头象
+	required bool sex = 5;			// 性别
+	required int32 country = 6;		// 国家
+	required int32 province = 7;	// 省
+	required int32 city = 8;		// 市
+	required string signature = 9;  // 个性签名
+	required int32 money = 10;		// 金钱
+	required int32 turnmoney = 11;  // 设置金额
+	required string qrcode = 12;    // 二维码
+	required string phone = 13;		// 手机号码
+	required int32 year = 14;		// 年
+	required int32 month = 15; 		// 月
+	required int32 day = 16;		// 日
+}
+
+//保存数据脏
+message SaveTypeInfo
+{
+	required uint64 type = 1;
+	required int64 id = 2;
+	required bool isdel = 3;
+	optional BaseInfo bsinfo = 4;
+}
+
+message FriendInfoList
+{
+	repeated FriendInfo friends 		= 1; //好友信息
+	repeated int64 inwho 				= 2; //我在谁的好友里面
+	repeated int64 inGroup				= 3; //我在那个组里
+	optional int32 m_ReceiveCounts 		= 4; //当天接收个数
+	optional int32 m_SendCounts 		= 5; //当天发送个数
+}
+
+message FriendInfo
+{
+	required int32 type			= 1;    		//类型好友
+	required int64 charid		= 2;  			//好友ID
+	required string friendname 	= 3; 			//好友名称
+	optional int32 sex			= 4;			//性别
+	optional int32 point		= 5;			//坐标
+}

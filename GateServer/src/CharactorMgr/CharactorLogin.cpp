@@ -25,6 +25,9 @@ CharactorLogin::CharactorLogin()
 	DEF_MSG_ACK_REG_FUN(eGateServer, MSG_REQ_GT2GM_PLAYERINFO);
 	DEF_MSG_REQUEST_REG_FUN(eGateServer, MSG_REQ_C2GT_CLIENTIN);
 	DEF_MSG_ACK_REG_FUN(eGateServer, MSG_REQ_GT2GM_CLIENTIN);
+
+	DEF_MSG_REQUEST_REG_FUN(eGateServer, MSG_REQ_C2GT_SYN_ATTR);
+	DEF_MSG_ACK_REG_FUN(eGateServer, MSG_REQ_GT2GM_SYN_ATTR);
 }
 
 CharactorLogin::~CharactorLogin()
@@ -47,6 +50,8 @@ void CharactorLogin::Handle_Request(Safe_Smart_Ptr<Message> &message)
 	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_C2GT_HEARTBEAT);
 	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_C2GT_PLAYERINFO);
 	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_C2GT_CLIENTIN);
+
+	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_C2GT_SYN_ATTR);
 	DEF_SWITCH_TRY_DISPATCH_END
 }
 
@@ -55,6 +60,7 @@ void CharactorLogin::Handle_Ack(Safe_Smart_Ptr<Message> &message)
 	DEF_SWITCH_TRY_DISPATCH_BEGIN
 
 	DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GT2GM_PLAYERINFO);
+	DEF_MSG_ACK_DISPATCH_FUN(MSG_REQ_GT2GM_SYN_ATTR);
 
 	DEF_SWITCH_TRY_DISPATCH_END
 }
@@ -253,5 +259,40 @@ DEF_MSG_ACK_DEFINE_FUN(CharactorLogin, MSG_REQ_GT2GM_CLIENTIN)
 	}
 
 	Safe_Smart_Ptr<CommBaseOut::Message> messRet  = build_message(MSG_REQ_C2GT_CLIENTIN, static_cast<requestAct *>(act.Get())->mesReq,&meContent);
+	Message_Facade::Send(messRet);
+}
+
+DEF_MSG_REQUEST_DEFINE_FUN(CharactorLogin, MSG_REQ_C2GT_SYN_ATTR)
+{
+	int64 charid = 0;
+	int gsChannel = -1;
+
+	LOG_DEBUG(FILEINFO, "[messageid = %d] player syn attr ", MSG_REQ_C2GT_SYN_ATTR);
+
+	if(ServerConHandler::GetInstance()->GetGSChannelAndCharIDByChannel(message->GetChannelID(), gsChannel, charid))
+	{
+		Safe_Smart_Ptr<CommBaseOut::Message> messRet  = build_message(MSG_REQ_GT2GM_SYN_ATTR,message, gsChannel, Request);
+		messRet->SetAct(new requestAct(message));
+		messRet->SetMessageTime(charid);
+		Message_Facade::Send(messRet);
+	}
+	else
+	{
+		LOG_ERROR(FILEINFO, "Player[charid=%lld] request syn attr but gameserver not existed",GET_PLAYER_CHARID(charid));
+	}
+}
+
+DEF_MSG_ACK_DEFINE_FUN(CharactorLogin, MSG_REQ_GT2GM_SYN_ATTR)
+{
+	if(message->GetErrno() == eReqTimeOut)
+	{
+		LOG_WARNING(FILEINFO, "gateserver request gameserver syn attr and ack timeout");
+
+		return;
+	}
+
+	LOG_DEBUG(FILEINFO, "gateserver request gameserver syn attr and return");
+
+	Safe_Smart_Ptr<CommBaseOut::Message> messRet  = build_message(MSG_REQ_C2GT_SYN_ATTR,message,static_cast<requestAct *>(act.Get())->mesReq->GetChannelID());
 	Message_Facade::Send(messRet);
 }

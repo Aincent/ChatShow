@@ -1,0 +1,39 @@
+package CharLogin;
+
+message CharBaseInfo
+{
+	required int64 charid = 1; 		// 用户id
+	required string charname = 2;	// 用户名字
+	required string wchatname = 3;  // 文人号
+	required string head = 4;		// 头象
+	required bool sex = 5;			// 性别
+	required int32 country = 6;		// 国家
+	required int32 province = 7;	// 省
+	required int32 city = 8;		// 市
+	required string signature = 9;  // 个性签名
+	required int32 money = 10;		// 金钱
+	required int32 turnmoney = 11;  // 设置金额
+	required string qrcode = 12;    // 二维码
+	required string phone = 13;		// 手机号码
+	required int32 year = 14;		// 年
+	required int32 month = 15; 		// 月
+	required int32 day = 16;		// 日
+}
+
+//const int MSG_REQ_GT2GM_SYN_ATTR = 1013;
+message SynCharBase
+{
+	repeated SynCharAttr attr = 1; //更新列表
+}
+
+message SynCharAttr
+{
+	required int32 type = 1; 			// 类型
+	optional int64 attrInt = 2; 	// Int值
+	optional string attrStr = 3;	// string值
+}
+
+message ResSynCharAttr
+{
+	required int64 state = 1; // 0为成功，其它为失败
+}

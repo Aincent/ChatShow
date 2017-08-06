@@ -142,12 +142,20 @@ void CCharLogin::getRoleInfo(int64 playerID,Smart_Ptr<PlayerDBMgr> player,CMysql
 
 		baseInfo->set_charid(mysqlInterface.GetInt64Name("CharID"));
 		baseInfo->set_charname(mysqlInterface.GetStringName("CharName"));
-		baseInfo->set_nickname(mysqlInterface.GetStringName("nickname"));
+		baseInfo->set_wchatname(mysqlInterface.GetStringName("wchatname"));
 		baseInfo->set_head(mysqlInterface.GetStringName("head"));
-		baseInfo->set_address(mysqlInterface.GetStringName("address"));
 		baseInfo->set_sex(mysqlInterface.GetIntName("sex"));
-		baseInfo->set_zone(mysqlInterface.GetStringName("zone"));
+		baseInfo->set_country(mysqlInterface.GetIntName("country"));
+		baseInfo->set_province(mysqlInterface.GetIntName("province"));
+		baseInfo->set_city(mysqlInterface.GetIntName("city"));
 		baseInfo->set_signature(mysqlInterface.GetStringName("signature"));
+		baseInfo->set_money(mysqlInterface.GetIntName("money"));
+		baseInfo->set_turnmoney(mysqlInterface.GetIntName("turnmoney"));
+		baseInfo->set_qrcode(mysqlInterface.GetStringName("qrcode"));
+		baseInfo->set_phone(mysqlInterface.GetStringName("phone"));
+		baseInfo->set_year(mysqlInterface.GetIntName("year"));
+		baseInfo->set_month(mysqlInterface.GetIntName("month"));
+		baseInfo->set_day(mysqlInterface.GetIntName("day"));
 
 		player->AddStruct(eBaseInfo, baseInfo);
 	}
