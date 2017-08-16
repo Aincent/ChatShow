@@ -44,6 +44,8 @@ public:
 		}
 	}
 
+	DEF_MSG_REQUEST_DECLARE_FUN_H(MSG_REQ_GT2GM_FRIEND_LIST);
+
 	virtual void Handle_Message(Safe_Smart_Ptr<Message> &message);
 	virtual void Handle_Request(Safe_Smart_Ptr<Message> &message);
 	virtual void Handle_Ack(Safe_Smart_Ptr<Message> &message);

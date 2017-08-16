@@ -18,13 +18,13 @@
 #include "FriendMgr.h"
 #include "../Object/Player/PlayerMessage.h"
 #include "../Object/Player/Player.h"
-#include "ServerEventDefine.h"
+#include "../ServerEventDefine.h"
 
 FriendMessage * FriendMessage::m_instance = 0;
 
 FriendMessage::FriendMessage()
 {
-
+	DEF_MSG_REQUEST_REG_FUN(eGameServer, MSG_REQ_GT2GM_FRIEND_LIST);
 //	startClearTimer();
 //
 	m_OfflineEvent = RegGlobalEventPtr(PLAYER_OFFLINE,this,&FriendMessage::offline);
@@ -56,7 +56,7 @@ void FriendMessage::Handle_Request(Safe_Smart_Ptr<Message> &message)
 {
 	DEF_SWITCH_TRY_DISPATCH_BEGIN
 
-
+	DEF_MSG_REQUEST_DISPATCH_FUN(MSG_REQ_GT2GM_FRIEND_LIST);
 
 	DEF_SWITCH_TRY_DISPATCH_END
 }
@@ -98,62 +98,62 @@ bool FriendMessage::offline(const EventArgs& e)
 
 void FriendMessage::clearWatch(int64 charID)
 {
-		std::map<int64,std::set<int64> >::iterator it = m_watch_list.find(charID);
-		if(it == m_watch_list.end())
-			return;
+	std::map<int64,std::set<int64> >::iterator it = m_watch_list.find(charID);
+	if(it == m_watch_list.end())
+		return;
 
-		std::set<int64>::iterator itChar = it->second.begin();
-		for(; itChar != it->second.end(); ++itChar)
+	std::set<int64>::iterator itChar = it->second.begin();
+	for(; itChar != it->second.end(); ++itChar)
+	{
+		std::map<int64,std::set<int64> >::iterator it_gloable = m_event_list.find(*itChar);
+		if(it_gloable != m_event_list.end())
 		{
-			std::map<int64,std::set<int64> >::iterator it_gloable = m_event_list.find(*itChar);
-			if(it_gloable != m_event_list.end())
-			{
-				it_gloable->second.erase(charID);
-				if(it_gloable->second.empty())
-					m_event_list.erase(it_gloable);
-			}
+			it_gloable->second.erase(charID);
+			if(it_gloable->second.empty())
+				m_event_list.erase(it_gloable);
 		}
+	}
 
-		//清除个人列表
-		it->second.clear();
-		m_watch_list.erase(it);
+	//清除个人列表
+	it->second.clear();
+	m_watch_list.erase(it);
 }
 
 void FriendMessage::cancelWatch(int64 selfID, int64 targetID)
 {
-		std::map<int64,std::set<int64> >::iterator it = m_event_list.find(targetID);
-		if(it==m_event_list.end()) return;
+	std::map<int64,std::set<int64> >::iterator it = m_event_list.find(targetID);
+	if(it==m_event_list.end()) return;
 
-		it->second.erase(selfID);
-		if(it->second.empty())
-		{
-			m_event_list.erase(it);
-		}
+	it->second.erase(selfID);
+	if(it->second.empty())
+	{
+		m_event_list.erase(it);
+	}
 }
 
 void FriendMessage::watch(int64 selfID, int64 targetID)
 {
-		std::set<int64>	& refCharList =	m_event_list[targetID];
-		std::set<int64>::iterator it = refCharList.find(selfID);
-		if(it==refCharList.end())
-		{
-			refCharList.insert(selfID);
-			std::set<int64>& myWatch =	m_watch_list[selfID];
-			myWatch.insert(targetID);
-		}
+	std::set<int64>	& refCharList =	m_event_list[targetID];
+	std::set<int64>::iterator it = refCharList.find(selfID);
+	if(it==refCharList.end())
+	{
+		refCharList.insert(selfID);
+		std::set<int64>& myWatch =	m_watch_list[selfID];
+		myWatch.insert(targetID);
+	}
 }
 
 void FriendMessage::dispatchEvent(int64 charID, int attrType, int value)
 {
-		std::map<int64,std::set<int64> >::iterator it = m_event_list.find(charID);
-		if(it==m_event_list.end() || it->second.size()==0)
-			return;
+	std::map<int64,std::set<int64> >::iterator it = m_event_list.find(charID);
+	if(it==m_event_list.end() || it->second.size()==0)
+		return;
 
-		std::set<int64>::iterator itChar = it->second.begin();
-		for(; itChar != it->second.end(); ++itChar)
-		{
-			onEvent( charID, *itChar, attrType, value );
-		}
+	std::set<int64>::iterator itChar = it->second.begin();
+	for(; itChar != it->second.end(); ++itChar)
+	{
+		onEvent( charID, *itChar, attrType, value );
+	}
 }
 
 int FriendMessage::GetFriendWatchSelf(int64 charID, set<int64>& watchSelf)
@@ -165,4 +165,16 @@ int FriendMessage::GetFriendWatchSelf(int64 charID, set<int64>& watchSelf)
 	watchSelf = it->second;
 
 	return 0;
+}
+
+//客户端获取好友列表
+DEF_MSG_REQUEST_DEFINE_FUN(FriendMessage, MSG_REQ_GT2GM_FRIEND_LIST)
+{
+	int64 charID = message->GetMessageTime();
+	Smart_Ptr<Player> player;
+	PlayerMessage::GetInstance()->GetPlayerByCharid(charID, player);
+	if(player)
+	{
+		player->GetFriendManager()->GetFriendsInfo();
+	}
 }
