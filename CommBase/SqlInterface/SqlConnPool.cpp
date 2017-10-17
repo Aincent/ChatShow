@@ -333,7 +333,7 @@ CMysqlConn *CSqlConnPool::GetConnection()
 		char dec[128] = {0};
 		string what;
 
-		snprintf(dec, 512, "[CSqlConnPool::GetConnection] idle connection is zero");
+		snprintf(dec, 128, "[CSqlConnPool::GetConnection] idle connection is zero");
 		what = dec;
 
 		LOG_BASE(FILEINFO, "GetConnection failed,error msg[%s]", dec);
